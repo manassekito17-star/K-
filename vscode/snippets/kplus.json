@@ -1,0 +1,47 @@
+{
+  "si": {
+    "prefix": "si",
+    "body": ["si ${1:condition} alors", "\t$0", "fin"],
+    "description": "Condition si … alors … fin"
+  },
+  "si sinon": {
+    "prefix": "sisinon",
+    "body": ["si ${1:condition} alors", "\t$2", "sinon", "\t$0", "fin"],
+    "description": "Condition avec sinon"
+  },
+  "tant que": {
+    "prefix": "tantque",
+    "body": ["tant que ${1:condition} faire", "\t$0", "fin"],
+    "description": "Boucle tant que … faire … fin"
+  },
+  "pour": {
+    "prefix": "pour",
+    "body": ["pour ${1:i} de ${2:1} à ${3:10} faire", "\t$0", "fin"],
+    "description": "Boucle avec compteur"
+  },
+  "pour chaque": {
+    "prefix": "pourchaque",
+    "body": ["pour chaque ${1:element} dans ${2:liste} faire", "\t$0", "fin"],
+    "description": "Parcourir une liste ou un texte"
+  },
+  "fonction": {
+    "prefix": "fonction",
+    "body": ["fonction ${1:nom}(${2:parametres})", "\t$0", "fin"],
+    "description": "Définir une fonction"
+  },
+  "essayer": {
+    "prefix": "essayer",
+    "body": ["essayer", "\t$1", "attraper ${2:erreur}", "\tafficher(\"Erreur : \" + ${2:erreur})", "fin"],
+    "description": "Gérer une erreur"
+  },
+  "afficher": {
+    "prefix": "afficher",
+    "body": ["afficher(${1:\"Bonjour\"})"],
+    "description": "Afficher une valeur"
+  },
+  "variable": {
+    "prefix": "variable",
+    "body": ["variable ${1:nom} = ${0:valeur}"],
+    "description": "Déclarer une variable"
+  }
+}

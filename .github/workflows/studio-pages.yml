@@ -31,8 +31,16 @@ jobs:
           python-version: "3.13"
       - name: Tests (rien n'est publié si un test échoue)
         run: python -m unittest
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
       - name: Construction de K+ Studio
         run: python studio/construire.py
+      - name: Extension VS Code (téléchargeable sur le site)
+        run: |
+          python vscode/construire.py --paquet
+          mkdir -p studio/dist/telechargements
+          cp vscode/dist/kplus-*.vsix studio/dist/telechargements/kplus-vscode.vsix
       - name: GitHub Pages est-il activé ?
         id: pages
         continue-on-error: true

@@ -69,6 +69,15 @@ K+ Studio peut aussi être **installé depuis le navigateur** (bouton
 « ⬇ Installer ») : il devient une application avec son icône et fonctionne
 sans Internet.
 
+## Extension pour VS Code
+
+Couleurs, erreurs soulignées pendant la saisie et bouton ▶ pour exécuter les
+fichiers `.kplus` dans Visual Studio Code.
+
+Téléchargement : **https://manassekito17-star.github.io/K-/telechargements/kplus-vscode.vsix**
+(puis, dans VS Code : Extensions → `…` → `Install from VSIX...`).
+Voir [vscode/README.md](vscode/README.md).
+
 ## Tests
 
 ```

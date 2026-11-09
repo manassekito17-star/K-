@@ -48,3 +48,29 @@ jobs:
         run: node studio/tests/e2e.mjs
       - name: Test dans un sous-dossier (comme sur GitHub Pages)
         run: node studio/tests/e2e.mjs --sous-chemin K-
+
+  vscode:
+    name: Extension VS Code
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Outils de test
+        working-directory: vscode
+        run: npm ci
+      - name: Tests des couleurs
+        run: node --test vscode/tests/grammaire.test.mjs
+      - name: Construction du paquet .vsix
+        run: python vscode/construire.py --paquet
+      - name: Test dans un vrai VS Code
+        run: xvfb-run -a node vscode/tests/lancer.mjs
+      - name: Paquet de l'extension (téléchargeable depuis cette page)
+        uses: actions/upload-artifact@v4
+        with:
+          name: extension-vscode-kplus
+          path: vscode/dist/*.vsix

@@ -1,0 +1,117 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "K+",
+  "scopeName": "source.kplus",
+  "fileTypes": ["kplus"],
+  "patterns": [
+    { "include": "#commentaires" },
+    { "include": "#textes" },
+    { "include": "#nombres" },
+    { "include": "#definition-fonction" },
+    { "include": "#mots-cles" },
+    { "include": "#natives" },
+    { "include": "#appel" },
+    { "include": "#operateurs" },
+    { "include": "#inconnu" }
+  ],
+  "repository": {
+    "commentaires": {
+      "patterns": [
+        {
+          "name": "comment.block.kplus",
+          "begin": "/\\*",
+          "end": "\\*/",
+          "beginCaptures": { "0": { "name": "punctuation.definition.comment.begin.kplus" } },
+          "endCaptures": { "0": { "name": "punctuation.definition.comment.end.kplus" } }
+        },
+        {
+          "name": "comment.line.number-sign.kplus",
+          "begin": "#",
+          "end": "$",
+          "beginCaptures": { "0": { "name": "punctuation.definition.comment.kplus" } }
+        }
+      ]
+    },
+    "textes": {
+      "patterns": [
+        {
+          "name": "string.quoted.double.kplus",
+          "begin": "\"",
+          "end": "\"|$",
+          "patterns": [{ "include": "#echappements" }]
+        },
+        {
+          "name": "string.quoted.other.typographic.kplus",
+          "begin": "“",
+          "end": "”|$",
+          "patterns": [{ "include": "#echappements" }]
+        }
+      ]
+    },
+    "echappements": {
+      "patterns": [
+        { "name": "constant.character.escape.kplus", "match": "\\\\[nt\"\\\\]" },
+        { "name": "invalid.illegal.escape.kplus", "match": "\\\\." }
+      ]
+    },
+    "nombres": {
+      "patterns": [
+        {
+          "name": "constant.numeric.decimal.kplus",
+          "match": "(?<![\\p{L}\\p{N}_])[0-9](?:_?[0-9])*(?:\\.[0-9](?:_?[0-9])*(?:[eE][+-]?[0-9]+)?|[eE][+-]?[0-9]+)(?![\\p{L}\\p{N}_])"
+        },
+        {
+          "name": "constant.numeric.integer.kplus",
+          "match": "(?<![\\p{L}\\p{N}_])[0-9](?:_?[0-9])*(?![\\p{L}\\p{N}_.])"
+        }
+      ]
+    },
+    "definition-fonction": {
+      "match": "(?<![\\p{L}\\p{N}_])(fonction)\\s+([\\p{L}_][\\p{L}\\p{M}\\p{N}_]*)",
+      "captures": {
+        "1": { "name": "storage.type.function.kplus" },
+        "2": { "name": "entity.name.function.kplus" }
+      }
+    },
+    "mots-cles": {
+      "patterns": [
+        {
+          "name": "keyword.control.kplus",
+          "match": "(?<![\\p{L}\\p{M}\\p{N}_])(si|alors|sinon|fin|tant|que|faire|pour|chaque|dans|de|à|pas|arreter|arrêter|continuer|retourner|essayer|attraper|lever)(?![\\p{L}\\p{M}\\p{N}_])"
+        },
+        {
+          "name": "storage.type.kplus",
+          "match": "(?<![\\p{L}\\p{M}\\p{N}_])(variable|constante|fonction)(?![\\p{L}\\p{M}\\p{N}_])"
+        },
+        {
+          "name": "keyword.operator.logical.kplus",
+          "match": "(?<![\\p{L}\\p{M}\\p{N}_])(et|ou|non)(?![\\p{L}\\p{M}\\p{N}_])"
+        },
+        {
+          "name": "constant.language.kplus",
+          "match": "(?<![\\p{L}\\p{M}\\p{N}_])(vrai|faux|nul)(?![\\p{L}\\p{M}\\p{N}_])"
+        }
+      ]
+    },
+    "natives": {
+      "name": "support.function.builtin.kplus",
+      "match": "(?<![\\p{L}\\p{M}\\p{N}_])(afficher|demander|texte|entier|decimal|décimal|type|longueur|ajouter|absolu|racine|arrondir|quitter)(?![\\p{L}\\p{M}\\p{N}_])"
+    },
+    "appel": {
+      "match": "([\\p{L}_][\\p{L}\\p{M}\\p{N}_]*)\\s*(?=\\()",
+      "captures": { "1": { "name": "entity.name.function.call.kplus" } }
+    },
+    "operateurs": {
+      "patterns": [
+        { "name": "keyword.operator.comparison.kplus", "match": "==|!=|<=|>=|<|>" },
+        { "name": "keyword.operator.assignment.kplus", "match": "=" },
+        { "name": "keyword.operator.arithmetic.kplus", "match": "[-+*/%^]" },
+        { "name": "punctuation.separator.comma.kplus", "match": "," }
+      ]
+    },
+    "inconnu": {
+      "name": "invalid.illegal.character.kplus",
+      "match": "[;@$&|{}'`~?!\\\\]"
+    }
+  }
+}

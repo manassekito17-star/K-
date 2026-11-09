@@ -1,0 +1,7 @@
+construire.py
+tests/**
+dist/**
+node_modules/**
+**/__pycache__/**
+**/*.pyc
+.gitignore

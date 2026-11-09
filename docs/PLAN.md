@@ -111,5 +111,9 @@ planter Pyodide).
   (publication automatique après les tests, vérifiée sur l'adresse publique).
 - K+ Studio installable depuis le navigateur (application web : icône,
   fenêtre propre, fonctionnement hors ligne, mises à jour proposées).
+- Extension K+ pour VS Code (`vscode/`) : couleurs, erreurs soulignées
+  pendant la saisie (vrai moteur K+), exécution dans le terminal, raccourcis
+  d'écriture ; testée dans un vrai VS Code (11 vérifications) et
+  téléchargeable sur le site.
 - Pistes suivantes : paquet installable (PyPI), première étape vers un
   compilateur.

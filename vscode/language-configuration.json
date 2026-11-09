@@ -1,0 +1,21 @@
+{
+  "comments": { "lineComment": "#", "blockComment": ["/*", "*/"] },
+  "brackets": [["(", ")"], ["[", "]"]],
+  "autoClosingPairs": [
+    { "open": "(", "close": ")" },
+    { "open": "[", "close": "]" },
+    { "open": "\"", "close": "\"", "notIn": ["string", "comment"] },
+    { "open": "“", "close": "”", "notIn": ["string", "comment"] },
+    { "open": "/*", "close": " */", "notIn": ["string"] }
+  ],
+  "surroundingPairs": [["(", ")"], ["[", "]"], ["\"", "\""], ["“", "”"]],
+  "wordPattern": "[\\p{L}_][\\p{L}\\p{M}\\p{N}_]*|-?\\d+(?:_\\d+)*(?:\\.\\d+)?(?:[eE][+-]?\\d+)?",
+  "indentationRules": {
+    "increaseIndentPattern": "^((?!#).)*\\b(alors|faire|sinon|essayer)\\s*(#.*)?$|^\\s*attraper(\\s+[\\p{L}_][\\p{L}\\p{M}\\p{N}_]*)?\\s*(#.*)?$|^\\s*fonction\\s.*\\)\\s*(#.*)?$",
+    "decreaseIndentPattern": "^\\s*(fin|sinon|attraper)\\b"
+  },
+  "folding": {
+    "offSide": false,
+    "markers": { "start": "^\\s*#\\s*région\\b", "end": "^\\s*#\\s*fin\\s+région\\b" }
+  }
+}

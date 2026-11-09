@@ -1,0 +1,143 @@
+{
+  "name": "kplus",
+  "displayName": "K+",
+  "description": "Langage K+ (programmation en français) : couleurs, correction des erreurs pendant la saisie, exécution.",
+  "version": "0.1.0",
+  "publisher": "kplus-langage",
+  "icon": "icones/icone-512.png",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/manassekito17-star/K-"
+  },
+  "homepage": "https://manassekito17-star.github.io/K-/",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Programming Languages",
+    "Snippets",
+    "Linters",
+    "Education"
+  ],
+  "keywords": [
+    "K+",
+    "kplus",
+    "français",
+    "french",
+    "apprentissage"
+  ],
+  "main": "./extension.js",
+  "activationEvents": [
+    "onLanguage:kplus"
+  ],
+  "contributes": {
+    "languages": [
+      {
+        "id": "kplus",
+        "aliases": [
+          "K+",
+          "kplus"
+        ],
+        "extensions": [
+          ".kplus"
+        ],
+        "configuration": "./language-configuration.json",
+        "icon": {
+          "light": "./icones/icone.svg",
+          "dark": "./icones/icone.svg"
+        }
+      }
+    ],
+    "grammars": [
+      {
+        "language": "kplus",
+        "scopeName": "source.kplus",
+        "path": "./syntaxes/kplus.tmLanguage.json"
+      }
+    ],
+    "snippets": [
+      {
+        "language": "kplus",
+        "path": "./snippets/kplus.json"
+      }
+    ],
+    "commands": [
+      {
+        "command": "kplus.executer",
+        "title": "Exécuter le fichier",
+        "category": "K+",
+        "icon": "$(play)"
+      },
+      {
+        "command": "kplus.verifier",
+        "title": "Vérifier le fichier",
+        "category": "K+"
+      }
+    ],
+    "menus": {
+      "editor/title/run": [
+        {
+          "command": "kplus.executer",
+          "when": "resourceLangId == kplus",
+          "group": "navigation"
+        }
+      ],
+      "editor/context": [
+        {
+          "command": "kplus.executer",
+          "when": "resourceLangId == kplus",
+          "group": "navigation"
+        }
+      ],
+      "explorer/context": [
+        {
+          "command": "kplus.executer",
+          "when": "resourceLangId == kplus",
+          "group": "navigation"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "kplus.executer",
+          "when": "editorLangId == kplus"
+        },
+        {
+          "command": "kplus.verifier",
+          "when": "editorLangId == kplus"
+        }
+      ]
+    },
+    "keybindings": [
+      {
+        "command": "kplus.executer",
+        "key": "ctrl+enter",
+        "mac": "cmd+enter",
+        "when": "editorTextFocus && editorLangId == kplus"
+      }
+    ],
+    "configuration": {
+      "title": "K+",
+      "properties": {
+        "kplus.cheminPython": {
+          "type": "string",
+          "default": "",
+          "markdownDescription": "Chemin de Python 3.10 ou plus récent. Laisser vide pour le trouver automatiquement (`py -3`, `python3` ou `python`)."
+        },
+        "kplus.correctionPendantSaisie": {
+          "type": "boolean",
+          "default": true,
+          "description": "Souligner les erreurs K+ pendant la saisie."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "test": "node tests/lancer.mjs",
+    "test:grammaire": "node --test tests/grammaire.test.mjs"
+  },
+  "devDependencies": {
+    "@vscode/test-electron": "2.4.1",
+    "vscode-oniguruma": "2.0.1",
+    "vscode-textmate": "9.1.0"
+  }
+}
