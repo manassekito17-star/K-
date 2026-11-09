@@ -16,7 +16,8 @@ fin
 
 ## État du projet
 
-**K+ 0.1 fonctionne** : l'interpréteur exécute réellement les programmes K+.
+**K+ 0.1 fonctionne et est validé** sur Windows, macOS et Linux :
+l'interpréteur exécute réellement les programmes K+.
 Les fonctionnalités de la version 0.1 sont toutes implémentées : affichage,
 variables, constantes, types, calculs, conditions, boucles, fonctions,
 commentaires et gestion des erreurs.
@@ -25,7 +26,7 @@ commentaires et gestion des erreurs.
 |---|---|
 | 1. Spécification et grammaire | Terminée |
 | 2. Moteur (interpréteur Python) | Terminée |
-| 3. Tests et validation de K+ 0.1 | À faire (tests de base déjà en place) |
+| 3. Tests et validation de K+ 0.1 | Terminée ([rapport](docs/VALIDATION-0.1.md)) |
 | 4. K+ Studio | À faire |
 | 5. Multiplateforme | À faire |
 | 6. Bibliothèques avancées et IA | À faire |
@@ -57,7 +58,12 @@ Sans installation, depuis le dossier du projet : `python -m kplus exemples/bonjo
 ```
 python -m unittest                    # tous les tests
 python tests/conformite_lanceur.py    # les 48 cas de conformité, avec détail
+python tests/robustesse.py 30000      # campagne de robustesse longue
 ```
+
+Des programmes d'exemple se trouvent dans [`exemples/`](exemples/) :
+calculatrice, jeu de devinette, statistiques, nombres premiers, textes,
+compte bancaire, grands nombres.
 
 ## Documentation
 
@@ -65,4 +71,5 @@ python tests/conformite_lanceur.py    # les 48 cas de conformité, avec détail
 - [Grammaire formelle (EBNF)](docs/specification/grammaire.ebnf)
 - [Cas de test de conformité](tests/conformite/README.md)
 - [Architecture du moteur](docs/ARCHITECTURE.md)
+- [Rapport de validation K+ 0.1](docs/VALIDATION-0.1.md)
 - [Plan de travail](docs/PLAN.md)

@@ -4,7 +4,7 @@
 |---|---|---|
 | 1 | Spécification technique et grammaire | Terminée (décisions validées) |
 | 2 | Développement du moteur (interpréteur Python) | **Terminée** |
-| 3 | Tests et validation de K+ 0.1 | À faire |
+| 3 | Tests et validation de K+ 0.1 | **Terminée** |
 | 4 | K+ Studio (éditeur) | À faire |
 | 5 | Évolution multiplateforme (paquets, compilateur natif) | À faire |
 | 6 | Bibliothèques avancées et intelligence artificielle | À faire |
@@ -73,18 +73,24 @@ Résultats de la Phase 2 :
 - suite de tests réussie sous Python 3.10, 3.11, 3.12 et 3.13 (Linux) ;
 - installation par `pip install .` vérifiée dans un environnement isolé.
 
-Non vérifié à ce stade : exécution réelle sous Windows et macOS (prévu en
-Phase 3 via l'intégration continue).
+Windows et macOS ont ensuite été vérifiés en Phase 3.
 
-## Phase 3 — Tests prévus
+## Phase 3 — Tests et validation (livrée)
 
-Déjà en place depuis la Phase 2 : tests unitaires par composant et lanceur
-des 48 cas de conformité. La Phase 3 ajoutera :
+Rapport complet : [`VALIDATION-0.1.md`](VALIDATION-0.1.md).
 
-- **Programmes plus complets** (exemples réalistes : calculatrice, jeux de
-  devinette, statistiques sur des listes) pour éprouver le langage ;
-- **Tests de robustesse** : programmes malformés générés automatiquement, pour
-  vérifier que K+ affiche toujours une erreur claire et jamais d'« erreur
-  interne » ;
-- **Intégration continue** : exécution des tests sur Windows, Linux et macOS
-  (GitHub Actions) — à confirmer avec le responsable du projet.
+- Intégration continue : `.github/workflows/tests.yml` (Windows, macOS,
+  Linux × Python 3.10 et 3.13) ;
+- 8 programmes d'exemple dans `exemples/`, sorties vérifiées
+  (`tests/test_exemples.py`) ;
+- tests de robustesse et comparaison des calculs avec Python
+  (`tests/robustesse.py`, `tests/test_robustesse.py`) ;
+- un bogue réel corrigé (plantage Windows + Python 3.10 sur récursion
+  profonde).
+
+## Phase 4 — K+ Studio (à venir)
+
+Éditeur officiel. Questions à trancher avec le responsable du projet avant de
+commencer : application de bureau ou application web, fonctionnalités de la
+première version (coloration syntaxique, bouton Exécuter, affichage des
+erreurs sur la ligne concernée...).
