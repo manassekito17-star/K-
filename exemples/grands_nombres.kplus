@@ -1,0 +1,25 @@
+# Entiers de précision illimitée : factorielle et suite de Fibonacci.
+
+fonction factorielle(n)
+    variable resultat = 1
+    pour i de 2 à n faire
+        resultat = resultat * i
+    fin
+    retourner resultat
+fin
+
+fonction fibonacci(n)
+    variable a = 0
+    variable b = 1
+    pour i de 1 à n faire
+        variable suivant = a + b
+        a = b
+        b = suivant
+    fin
+    retourner a
+fin
+
+afficher("50! =", factorielle(50))
+afficher("fibonacci(100) =", fibonacci(100))
+afficher("2^128 =", 2 ^ 128)
+afficher("Chiffres de 100! :", longueur(texte(factorielle(100))))

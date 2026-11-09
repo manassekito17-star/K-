@@ -93,7 +93,11 @@ L'interpréteur est récursif : un appel de fonction K+ utilise environ 7
 niveaux de la pile Python, une parenthèse imbriquée environ 12. La limite
 par défaut de Python (1000 niveaux) aurait donc limité K+ à environ 140 appels
 imbriqués au lieu des 1000 promis. `pile.py` exécute l'analyse et l'exécution
-dans un fil doté d'une pile de 256 Mo et relève la limite de Python. La limite
+dans un fil doté d'une grande pile (255, 128 ou 64 Mio selon ce que le
+système accepte : Windows refuse 256 Mio) et relève la limite de Python
+pendant l'exécution. Si aucune grande pile n'est possible, une récursion trop
+profonde donne une `ErreurRecursion`, jamais un plantage. Environ 1000
+niveaux de parenthèses imbriquées sont garantis. La limite
 K+ (1000 appels) est contrôlée séparément par l'interpréteur et produit une
 `ErreurRecursion` claire.
 

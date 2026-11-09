@@ -1,0 +1,30 @@
+# Crible d'Ératosthène : nombres premiers jusqu'à 100.
+
+constante LIMITE = 100
+
+variable est_premier = []
+pour i de 0 à LIMITE faire
+    ajouter(est_premier, vrai)
+fin
+est_premier[0] = faux
+est_premier[1] = faux
+
+pour i de 2 à LIMITE faire
+    si i * i > LIMITE alors
+        arreter
+    fin
+    si est_premier[i] alors
+        pour multiple de i * i à LIMITE pas i faire
+            est_premier[multiple] = faux
+        fin
+    fin
+fin
+
+variable premiers = []
+pour i de 2 à LIMITE faire
+    si est_premier[i] alors
+        ajouter(premiers, i)
+    fin
+fin
+afficher(premiers)
+afficher(longueur(premiers), "nombres premiers jusqu'à", LIMITE)

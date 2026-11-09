@@ -1,0 +1,6 @@
+dépôt 25 → solde : 75
+retrait 100 → solde : -25
+retrait 80 → erreur : retrait refusé : découvert maximal dépassé
+dépôt -5 → erreur : le montant doit être positif
+virement 10 → erreur : opération inconnue
+dépôt 200 → solde : 175

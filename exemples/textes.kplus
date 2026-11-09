@@ -1,0 +1,37 @@
+# Manipulation de textes : parcours, inversion, palindromes.
+
+fonction inverser(t)
+    variable resultat = ""
+    pour chaque c dans t faire
+        resultat = c + resultat
+    fin
+    retourner resultat
+fin
+
+fonction compter_voyelles(t)
+    variable n = 0
+    pour chaque c dans t faire
+        pour chaque v dans "aeiouyàâéèêëîïôùûAEIOUY" faire
+            si c == v alors
+                n = n + 1
+                arreter
+            fin
+        fin
+    fin
+    retourner n
+fin
+
+fonction est_palindrome(t)
+    variable lettres = ""
+    pour chaque c dans t faire
+        si c != " " alors
+            lettres = lettres + c
+        fin
+    fin
+    retourner lettres == inverser(lettres)
+fin
+
+pour chaque mot dans ["kayak", "Manassé", "esope reste ici et se repose", "bonjour"] faire
+    afficher("«", mot, "» inversé :", inverser(mot))
+    afficher("  voyelles :", compter_voyelles(mot), "| palindrome :", est_palindrome(mot))
+fin

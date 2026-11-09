@@ -1,0 +1,38 @@
+# Compte bancaire : fermetures (closures), constantes et erreurs levées.
+
+constante DECOUVERT_MAX = 100
+
+fonction creer_compte(titulaire, solde_initial)
+    variable solde = solde_initial
+
+    fonction operation(type_op, montant)
+        si montant <= 0 alors
+            lever "le montant doit être positif"
+        fin
+        si type_op == "dépôt" alors
+            solde = solde + montant
+        sinon si type_op == "retrait" alors
+            si solde - montant < -DECOUVERT_MAX alors
+                lever "retrait refusé : découvert maximal dépassé"
+            fin
+            solde = solde - montant
+        sinon
+            lever "opération inconnue"
+        fin
+        retourner solde
+    fin
+
+    retourner operation
+fin
+
+variable compte = creer_compte("Awa", 50)
+variable operations = [["dépôt", 25], ["retrait", 100], ["retrait", 80],
+                       ["dépôt", -5], ["virement", 10], ["dépôt", 200]]
+
+pour chaque op dans operations faire
+    essayer
+        afficher(op[0], op[1], "→ solde :", compte(op[0], op[1]))
+    attraper message
+        afficher(op[0], op[1], "→ erreur :", message)
+    fin
+fin

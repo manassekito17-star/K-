@@ -1,0 +1,61 @@
+# Statistiques sur une liste de notes : boucles, listes, fonctions.
+
+fonction somme(liste)
+    variable total = 0
+    pour chaque x dans liste faire
+        total = total + x
+    fin
+    retourner total
+fin
+
+fonction moyenne(liste)
+    retourner somme(liste) / longueur(liste)
+fin
+
+fonction trier(liste)
+    # Tri par insertion sur une copie de la liste
+    variable copie = []
+    pour chaque x dans liste faire
+        ajouter(copie, x)
+    fin
+    pour i de 1 à longueur(copie) - 1 faire
+        variable valeur = copie[i]
+        variable j = i - 1
+        tant que j >= 0 et copie[j] > valeur faire
+            copie[j + 1] = copie[j]
+            j = j - 1
+        fin
+        copie[j + 1] = valeur
+    fin
+    retourner copie
+fin
+
+fonction mediane(liste)
+    variable t = trier(liste)
+    variable n = longueur(t)
+    si n % 2 == 1 alors
+        retourner t[entier(n / 2)]
+    fin
+    variable milieu = entier(n / 2)
+    retourner (t[milieu - 1] + t[milieu]) / 2
+fin
+
+fonction ecart_type(liste)
+    variable m = moyenne(liste)
+    variable total = 0
+    pour chaque x dans liste faire
+        total = total + (x - m) ^ 2
+    fin
+    retourner racine(total / longueur(liste))
+fin
+
+variable notes = [12, 15, 9, 18, 11, 14, 7, 16]
+afficher("Notes      :", notes)
+afficher("Triées     :", trier(notes))
+afficher("Original   :", notes)
+afficher("Somme      :", somme(notes))
+afficher("Moyenne    :", moyenne(notes))
+afficher("Médiane    :", mediane(notes))
+afficher("Écart-type :", arrondir(ecart_type(notes), 2))
+afficher("Minimum    :", trier(notes)[0])
+afficher("Maximum    :", trier(notes)[longueur(notes) - 1])

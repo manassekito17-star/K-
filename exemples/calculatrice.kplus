@@ -1,0 +1,35 @@
+# Calculatrice : fonctions, conditions et gestion des erreurs
+
+fonction calculer(a, operation, b)
+    si operation == "+" alors
+        retourner a + b
+    sinon si operation == "-" alors
+        retourner a - b
+    sinon si operation == "*" alors
+        retourner a * b
+    sinon si operation == "/" alors
+        retourner a / b
+    sinon si operation == "^" alors
+        retourner a ^ b
+    fin
+    lever "opération inconnue : " + operation
+fin
+
+variable calculs = [
+    [12, "+", 30],
+    [7, "-", 10],
+    [6, "*", 7],
+    [22, "/", 7],
+    [2, "^", 64],
+    [1, "/", 0],
+    [3, "?", 4],
+]
+
+pour chaque c dans calculs faire
+    variable description = texte(c[0]) + " " + c[1] + " " + texte(c[2])
+    essayer
+        afficher(description, "=", calculer(c[0], c[1], c[2]))
+    attraper erreur
+        afficher(description, "→ impossible :", erreur)
+    fin
+fin

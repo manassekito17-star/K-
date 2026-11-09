@@ -1,0 +1,35 @@
+# Jeu de devinette : le joueur doit trouver un nombre entre 1 et 100.
+
+constante SECRET = 37
+constante ESSAIS_MAX = 7
+
+afficher("J'ai choisi un nombre entre 1 et 100.")
+variable essais = 0
+variable trouve = faux
+
+tant que non trouve et essais < ESSAIS_MAX faire
+    variable reponse = demander("Ta proposition : ")
+    si reponse == nul alors
+        afficher("Plus de réponses : fin du jeu.")
+        arreter
+    fin
+    essayer
+        variable nombre = entier(reponse)
+        essais = essais + 1
+        si nombre < SECRET alors
+            afficher("C'est plus grand.")
+        sinon si nombre > SECRET alors
+            afficher("C'est plus petit.")
+        sinon
+            trouve = vrai
+        fin
+    attraper
+        afficher("« " + reponse + " » n'est pas un nombre entier.")
+    fin
+fin
+
+si trouve alors
+    afficher("Bravo ! Trouvé en", essais, "essais.")
+sinon
+    afficher("Perdu ! Le nombre était", SECRET)
+fin

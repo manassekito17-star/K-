@@ -260,3 +260,43 @@ class TestNatives(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestGrandePile(unittest.TestCase):
+    """Reproduit la limite de Windows (pile de 256 Mio refusée)."""
+
+    def test_taille_refusee_par_le_systeme(self):
+        from unittest import mock
+
+        from kplus import pile
+        vraie = pile.threading.stack_size
+        demandees = []
+
+        def stack_size_type_windows(*taille):
+            if taille and taille[0] >= 256 * 1024 * 1024:
+                demandees.append(taille[0])
+                raise ValueError("size not valid")
+            if taille:
+                demandees.append(taille[0])
+            return vraie(*taille)
+
+        with mock.patch.object(pile.threading, "stack_size", stack_size_type_windows):
+            source = ("fonction f(n)\nsi n == 0 alors\nretourner 0\nfin\n"
+                      "retourner f(n - 1)\nfin\nafficher(f(999))")
+            self.assertEqual(executer(source), "0\n")
+        self.assertIn(255 * 1024 * 1024, demandees)
+
+    def test_sans_grande_pile_jamais_de_plantage(self):
+        from unittest import mock
+
+        from kplus import pile
+        with mock.patch.object(pile, "_demarrer_fil", lambda cible: None):
+            self.assertEqual(executer("afficher(1 + 1)"), "2\n")
+            source = ("fonction f(n)\nsi n == 0 alors\nretourner 0\nfin\n"
+                      "retourner f(n - 1)\nfin\nafficher(f(999))")
+            self.assertIsInstance(erreur_de(source), ErreurRecursion)
+
+    def test_parentheses_tres_imbriquees(self):
+        self.assertEqual(executer("afficher(" + "(" * 1000 + "1" + ")" * 1000 + ")"), "1\n")
+        e = erreur_de("afficher(" + "(" * 5000 + "1" + ")" * 5000 + ")")
+        self.assertIsInstance(e, ErreurRecursion)
