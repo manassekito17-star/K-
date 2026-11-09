@@ -10,6 +10,7 @@ exactement le même code que la commande « kplus ».
 """
 
 import functools
+import hashlib
 import http.server
 import json
 import shutil
@@ -22,7 +23,7 @@ RACINE = Path(__file__).resolve().parent.parent
 STUDIO = RACINE / "studio"
 DIST = STUDIO / "dist"
 FICHIERS_SITE = ["index.html", "studio.css", "studio.js", "coloration.js",
-                 "travailleur.js", "pont.py"]
+                 "travailleur.js", "pont.py", "manifest.webmanifest"]
 
 TITRES_EXEMPLES = {
     "bonjour": "Bonjour (exemple du cahier des charges)",
@@ -67,7 +68,29 @@ def construire(dist: Path = DIST) -> dict:
     manifeste = {"version": kplus.__version__, "moteur": moteur, "exemples": exemples}
     (dist / "manifeste.json").write_text(
         json.dumps(manifeste, ensure_ascii=False, indent=2), encoding="utf-8")
+
+    shutil.copytree(STUDIO / "icones", dist / "icones")
+    ecrire_service_worker(dist)
     return manifeste
+
+
+def ecrire_service_worker(dist: Path):
+    """Écrit service-worker.js avec la liste des fichiers à garder hors ligne
+    et un numéro de version calculé d'après leur contenu : toute modification
+    du site produit une nouvelle version, que les navigateurs récupèrent."""
+    fichiers = sorted(p.relative_to(dist).as_posix()
+                      for p in dist.rglob("*")
+                      if p.is_file() and p.relative_to(dist).as_posix() != "service-worker.js")
+    empreinte = hashlib.sha256()
+    for nom in fichiers:
+        empreinte.update(nom.encode("utf-8"))
+        empreinte.update((dist / nom).read_bytes())
+    version = empreinte.hexdigest()[:12]
+    source = (STUDIO / "service-worker.js").read_text(encoding="utf-8")
+    source = source.replace('"__VERSION__"', json.dumps(version))
+    source = source.replace("__FICHIERS__", json.dumps(["./"] + fichiers))
+    (dist / "service-worker.js").write_text(source, encoding="utf-8")
+    return version
 
 
 def servir(dist: Path = DIST, port: int = 8000):
@@ -75,6 +98,7 @@ def servir(dist: Path = DIST, port: int = 8000):
                                      directory=str(dist))
     gestionnaire.extensions_map = {**gestionnaire.extensions_map,
                                    ".js": "text/javascript", ".py": "text/plain",
+                                   ".webmanifest": "application/manifest+json",
                                    ".kplus": "text/plain"}
     socketserver.TCPServer.allow_reuse_address = True
     with socketserver.TCPServer(("127.0.0.1", port), gestionnaire) as serveur:

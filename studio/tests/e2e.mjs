@@ -10,6 +10,7 @@
  *
  * --sous-chemin sert le site dans un sous-dossier (http://…/NOM/), comme
  * GitHub Pages (https://utilisateur.github.io/K-/).
+ * --url ADRESSE teste un site déjà en ligne (sans construire ni servir).
  */
 import { spawn, execFileSync } from "node:child_process";
 import { readFileSync, mkdirSync, mkdtempSync, symlinkSync } from "node:fs";
@@ -25,6 +26,8 @@ const RACINE = path.resolve(path.dirname(new URL(import.meta.url).pathname), "..
 const args = process.argv.slice(2);
 const iSous = args.indexOf("--sous-chemin");
 const SOUS_CHEMIN = iSous >= 0 ? args.splice(iSous, 2)[1] : "";
+const iUrl = args.indexOf("--url");
+const URL_EN_LIGNE = iUrl >= 0 ? args.splice(iUrl, 2)[1] : "";
 const CAPTURES = args[0] || null;
 const resultats = [];
 
@@ -40,16 +43,20 @@ function portLibre() {
   });
 }
 
-execFileSync("python3", ["studio/construire.py"], { cwd: RACINE, stdio: "inherit" });
-const port = await portLibre();
-let dossierServi = path.join(RACINE, "studio/dist");
-if (SOUS_CHEMIN) {
-  dossierServi = mkdtempSync(path.join(os.tmpdir(), "kplus-studio-"));
-  symlinkSync(path.join(RACINE, "studio/dist"), path.join(dossierServi, SOUS_CHEMIN));
+let port = 0;
+let serveur = null;
+if (!URL_EN_LIGNE) {
+  execFileSync("python3", ["studio/construire.py"], { cwd: RACINE, stdio: "inherit" });
+  port = await portLibre();
+  let dossierServi = path.join(RACINE, "studio/dist");
+  if (SOUS_CHEMIN) {
+    dossierServi = mkdtempSync(path.join(os.tmpdir(), "kplus-studio-"));
+    symlinkSync(path.join(RACINE, "studio/dist"), path.join(dossierServi, SOUS_CHEMIN));
+  }
+  serveur = spawn("python3", ["-m", "http.server", String(port), "--bind", "127.0.0.1",
+                                    "--directory", dossierServi], { cwd: RACINE, stdio: "ignore" });
+  await new Promise((r) => setTimeout(r, 800));
 }
-const serveur = spawn("python3", ["-m", "http.server", String(port), "--bind", "127.0.0.1",
-                                  "--directory", dossierServi], { cwd: RACINE, stdio: "ignore" });
-await new Promise((r) => setTimeout(r, 800));
 
 const options = {};
 if (process.env.HTTPS_PROXY) {
@@ -68,6 +75,7 @@ const texteConsole = () => page.locator("#console").innerText();
 
 async function executer(source, entree = "") {
   await page.fill("#code", source);
+  await page.evaluate(() => { document.getElementById("bloc-entrees").open = true; });
   await page.fill("#entrees", entree);
   await page.click("#bouton-executer");
   await page.waitForFunction(() => {
@@ -79,7 +87,8 @@ async function executer(source, entree = "") {
 
 try {
   const debut = Date.now();
-  const adresse = `http://127.0.0.1:${port}/${SOUS_CHEMIN ? SOUS_CHEMIN + "/" : ""}`;
+  const adresse = URL_EN_LIGNE ||
+    `http://127.0.0.1:${port}/${SOUS_CHEMIN ? SOUS_CHEMIN + "/" : ""}`;
   console.log(`       (adresse testée : ${adresse})`);
   await page.goto(adresse);
   await attendreMoteur();
@@ -100,7 +109,9 @@ try {
   }
 
   // 2. Tous les exemples, comparés aux sorties attendues des tests.
-  const manifeste = JSON.parse(readFileSync(path.join(RACINE, "studio/dist/manifeste.json"), "utf8"));
+  const manifeste = URL_EN_LIGNE
+    ? await page.evaluate(async () => (await fetch("manifeste.json")).json())
+    : JSON.parse(readFileSync(path.join(RACINE, "studio/dist/manifeste.json"), "utf8"));
   for (const exemple of manifeste.exemples) {
     await page.selectOption("#choix-exemple", exemple.nom);
     await page.waitForFunction((n) => document.getElementById("nom-fichier").textContent === n + ".kplus",
@@ -187,7 +198,41 @@ try {
   sortie = await executer('pour i de 1 à 20000 faire\n    afficher("ligne", i)\nfin\n');
   verifier("20 000 lignes affichées", sortie.includes("ligne 20000\n"), sortie.slice(-200));
 
-  // 9. Thème sombre et petit écran (captures).
+  // 9. Application installable et utilisable sans Internet.
+  const cdp = await page.context().newCDPSession(page);
+  const fiche = await cdp.send("Page.getAppManifest");
+  verifier("fiche de l'application (manifest) lue sans erreur",
+           fiche.url.endsWith("manifest.webmanifest") && fiche.errors.length === 0,
+           JSON.stringify(fiche.errors));
+  const installation = await cdp.send("Page.getInstallabilityErrors");
+  // « in-incognito » : le navigateur de test est en navigation privée, où
+  // aucune installation n'est jamais proposée ; ce n'est pas un défaut du site.
+  const obstacles = installation.installabilityErrors.filter((e) => e.errorId !== "in-incognito");
+  verifier("le navigateur juge K+ Studio installable", obstacles.length === 0,
+           JSON.stringify(installation.installabilityErrors));
+  await cdp.detach();
+  verifier("service worker actif", await page.evaluate(async () =>
+    Boolean((await navigator.serviceWorker.ready).active)));
+  await page.reload();
+  await attendreMoteur();
+  await page.waitForFunction(() => document.getElementById("etat-hors-ligne").textContent.includes("Disponible hors ligne"),
+                             null, { timeout: 120000 });
+  verifier("indicateur « Disponible hors ligne »", true);
+  await page.context().setOffline(true);
+  await page.reload();
+  await attendreMoteur();
+  sortie = await executer('afficher("sans Internet :", 6 * 7)\n');
+  verifier("K+ Studio démarre et exécute un programme sans Internet",
+           sortie.startsWith("sans Internet : 42\n"), sortie);
+  const indicateur = await page.evaluate(() => {
+    const e = document.getElementById("etat-hors-ligne");
+    return { cache: e.hidden, texte: e.textContent, enLigne: navigator.onLine };
+  });
+  verifier("indicateur « Hors ligne »", !indicateur.cache && indicateur.texte.includes("Hors ligne"),
+           JSON.stringify(indicateur));
+  await page.context().setOffline(false);
+
+  // 10. Thème sombre et petit écran (captures).
   if (CAPTURES) {
     await page.fill("#code", readFileSync(path.join(RACINE, "exemples/statistiques.kplus"), "utf8"));
     await page.click("#bouton-executer");
@@ -205,7 +250,7 @@ try {
   verifier("déroulement du test", false, String(e && e.stack || e));
 } finally {
   await navigateur.close();
-  serveur.kill();
+  if (serveur) serveur.kill();
 }
 
 const echecs = resultats.filter((r) => !r.ok).length;

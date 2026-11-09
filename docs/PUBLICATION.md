@@ -5,8 +5,8 @@ l'adresse :
 
 **https://manassekito17-star.github.io/K-/**
 
-Cette adresse ne fonctionne qu'après l'activation ci-dessous, à faire **une
-seule fois**.
+**État : activé et en ligne** (vérifié par le test de bout en bout lancé sur
+l'adresse publique). Les étapes ci-dessous ne servent que pour un autre dépôt.
 
 ## Activation (une seule fois)
 

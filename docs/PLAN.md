@@ -107,9 +107,9 @@ planter Pyodide).
 
 ## Phase 5 — Évolution multiplateforme (en cours)
 
-- Mise en ligne de K+ Studio sur GitHub Pages : procédure automatique en
-  place (`.github/workflows/studio-pages.yml`), testée dans un sous-dossier
-  comme sur Pages. **Reste à faire par le responsable : activer Pages**
-  ([guide](PUBLICATION.md)).
+- K+ Studio en ligne sur GitHub Pages : https://manassekito17-star.github.io/K-/
+  (publication automatique après les tests, vérifiée sur l'adresse publique).
+- K+ Studio installable depuis le navigateur (application web : icône,
+  fenêtre propre, fonctionnement hors ligne, mises à jour proposées).
 - Pistes suivantes : paquet installable (PyPI), première étape vers un
   compilateur.

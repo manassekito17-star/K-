@@ -246,11 +246,34 @@ button.discret { border: none; background: none; color: var(--texte-doux); paddi
 .etat .pret::before { content: "● "; color: var(--succes); }
 .etat .echec { color: var(--danger); }
 
+/* --- Installation, hors ligne, mise à jour --- */
+
+button.installer { border-color: var(--accent); color: var(--accent); font-weight: 600; }
+.hors-ligne { color: var(--texte-doux); }
+.mise-a-jour {
+  font-size: 12px; padding: 1px 8px; border-color: var(--accent); color: var(--accent);
+}
+
+.dialogue {
+  max-width: min(480px, calc(100vw - 32px));
+  border: 1px solid var(--bord);
+  border-radius: 12px;
+  padding: 20px 24px;
+  background: var(--surface);
+  color: var(--texte);
+}
+.dialogue::backdrop { background: rgba(0, 0, 0, 0.45); }
+.dialogue h2 { margin: 0 0 8px; font-size: 18px; }
+.dialogue ol { padding-left: 20px; }
+.dialogue li { margin: 6px 0; }
+.dialogue form { text-align: right; margin-top: 12px; }
+
 /* --- Petits écrans --- */
 
 @media (max-width: 760px) {
   .espace { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(260px, 1fr) minmax(220px, auto); }
   .execution { margin-left: 0; width: 100%; }
+  .installer { width: 100%; }
   .execution button { flex: 1; }
   .barre { padding: 10px 16px; }
 }

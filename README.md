@@ -64,7 +64,10 @@ python studio/construire.py --servir
 Voir [studio/README.md](studio/README.md).
 
 En ligne, sans installation : **https://manassekito17-star.github.io/K-/**
-(disponible après l'activation décrite dans [docs/PUBLICATION.md](docs/PUBLICATION.md)).
+
+K+ Studio peut aussi être **installé depuis le navigateur** (bouton
+« ⬇ Installer ») : il devient une application avec son icône et fonctionne
+sans Internet.
 
 ## Tests
 

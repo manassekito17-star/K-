@@ -8,7 +8,36 @@ Il exécute le **vrai moteur K+** (les mêmes fichiers `kplus/*.py` que la
 commande `kplus`) grâce à [Pyodide](https://pyodide.org), une version de Python
 qui fonctionne dans le navigateur.
 
-## Lancer K+ Studio
+## Utiliser K+ Studio en ligne
+
+**https://manassekito17-star.github.io/K-/** : rien à installer.
+
+## Installer K+ Studio sur son appareil
+
+K+ Studio est une application web installable : une fois installée, elle a
+son icône sur l'écran d'accueil (téléphone) ou sur le bureau (ordinateur),
+s'ouvre dans sa propre fenêtre et **fonctionne sans Internet**.
+
+| Appareil | Comment installer |
+|---|---|
+| Ordinateur (Chrome, Edge) | bouton **⬇ Installer** dans K+ Studio, ou icône d'installation dans la barre d'adresse |
+| Android (Chrome) | bouton **⬇ Installer**, ou menu ⋮ → « Installer l'application » |
+| iPhone / iPad (Safari) | bouton **Partager** → « Sur l'écran d'accueil » → Ajouter |
+| Mac (Safari) | menu Fichier → « Ajouter au Dock » |
+
+Le bouton **⬇ Installer** de K+ Studio affiche les bonnes explications pour
+chaque appareil. Firefox sur ordinateur ne sait pas installer les
+applications web (Firefox sur Android, si).
+
+**Hors ligne.** À la première visite, K+ Studio garde sur l'appareil tout ce
+qu'il lui faut (environ 15 Mo, dont Python). La barre du bas affiche alors
+« ✓ Disponible hors ligne ».
+
+**Mises à jour.** Quand une nouvelle version est publiée, la barre du bas
+propose « Nouvelle version disponible : recharger ». Le programme en cours
+est conservé.
+
+## Lancer K+ Studio sur son ordinateur (développement)
 
 Depuis la racine du projet :
 
@@ -59,6 +88,9 @@ navigateur garde ces fichiers en cache.
 | `coloration.js` | coloration syntaxique (mêmes règles que le lexer du moteur) |
 | `travailleur.js` | fait tourner Pyodide et le moteur K+ en arrière-plan |
 | `pont.py` | relie le moteur K+ à la page (sortie, entrées, erreurs) |
+| `manifest.webmanifest`, `icones/` | fiche de l'application installable et ses icônes |
+| `service-worker.js` | fonctionnement hors ligne et mises à jour (liste des fichiers et version écrites par `construire.py`) |
+| `outils/generer_icones.mjs` | régénère les icônes PNG à partir de `icones/icone.svg` |
 | `construire.py` | assemble le site dans `studio/dist/` et peut le servir |
 
 ## Tests
@@ -67,8 +99,10 @@ navigateur garde ces fichiers en cache.
 |---|---|
 | Pont, construction, cohérence de la coloration avec le moteur | `python -m unittest tests.test_studio` |
 | Coloration | `node --test studio/tests/coloration.test.mjs` |
-| De bout en bout dans Chromium (27 vérifications) | `node studio/tests/e2e.mjs` |
+| De bout en bout dans Chromium (33 vérifications, dont installation et hors ligne) | `node studio/tests/e2e.mjs` |
+| Même test sur le site en ligne | `node studio/tests/e2e.mjs --url https://manassekito17-star.github.io/K-/` |
 
 Le test de bout en bout ouvre K+ Studio dans un vrai navigateur et l'utilise
 comme une personne : exécution de tous les exemples, erreurs, bouton
-Arrêter sur une boucle infinie, récursion profonde, `demander()`, etc.
+Arrêter sur une boucle infinie, récursion profonde, `demander()`,
+installabilité, et redémarrage complet avec le réseau coupé.

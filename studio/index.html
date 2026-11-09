@@ -4,6 +4,15 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>K+ Studio</title>
+  <meta name="description" content="Éditeur officiel du langage de programmation K+, en français.">
+  <meta name="theme-color" content="#2f5bd3">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icones/icone.svg" type="image/svg+xml">
+  <link rel="icon" href="icones/icone-192.png" type="image/png" sizes="192x192">
+  <link rel="apple-touch-icon" href="icones/apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="K+ Studio">
   <link rel="stylesheet" href="studio.css">
 </head>
 <body>
@@ -21,6 +30,8 @@
       </label>
       <input id="fichier" type="file" accept=".kplus,text/plain" hidden>
     </div>
+    <button id="bouton-installer" class="installer" type="button" hidden
+            title="Installer K+ Studio sur cet appareil">⬇ Installer</button>
     <div class="execution">
       <button id="bouton-executer" class="principal" type="button" disabled
               title="Exécuter (Ctrl+Entrée)">▶ Exécuter</button>
@@ -61,8 +72,19 @@
     </section>
   </main>
 
+  <dialog id="aide-installation" class="dialogue" aria-labelledby="titre-installation">
+    <h2 id="titre-installation">Installer K+ Studio</h2>
+    <p>Une fois installé, K+ Studio s'ouvre comme une application, avec son
+      icône, et fonctionne <strong>même sans Internet</strong>.</p>
+    <div id="instructions-installation"></div>
+    <form method="dialog"><button class="principal" type="submit">Compris</button></form>
+  </dialog>
+
   <footer class="etat">
     <span id="etat-moteur">Chargement du moteur K+…</span>
+    <span id="etat-hors-ligne" class="hors-ligne" hidden></span>
+    <button id="bouton-mise-a-jour" class="mise-a-jour" type="button" hidden>
+      Nouvelle version disponible : recharger</button>
     <span id="position">Ligne 1, colonne 1</span>
   </footer>
 

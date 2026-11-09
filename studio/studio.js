@@ -431,6 +431,132 @@
   $("bouton-enregistrer").addEventListener("click", enregistrer);
   $("bouton-effacer").addEventListener("click", viderConsole);
 
+  // --- Installation sur l'appareil et fonctionnement hors ligne ------------------------------
+
+  const boutonInstaller = $("bouton-installer");
+  const aideInstallation = $("aide-installation");
+  const instructionsInstallation = $("instructions-installation");
+  const etatHorsLigne = $("etat-hors-ligne");
+  const boutonMiseAJour = $("bouton-mise-a-jour");
+  let invitationInstallation = null;   // fournie par Chrome, Edge, Android
+  let disponibleHorsLigne = false;
+  let miseAJourDemandee = false;
+
+  function estInstalle() {
+    return window.matchMedia("(display-mode: standalone)").matches ||
+           window.navigator.standalone === true;
+  }
+
+  function instructionsPourCetAppareil() {
+    const ua = navigator.userAgent;
+    const ios = /iPhone|iPad|iPod/.test(ua) ||
+                (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+    if (ios) {
+      return "<ol><li>Ouvrez cette page dans <strong>Safari</strong>.</li>" +
+             "<li>Touchez le bouton <strong>Partager</strong> (un carré avec une flèche vers le haut).</li>" +
+             "<li>Choisissez <strong>« Sur l'écran d'accueil »</strong>, puis <strong>Ajouter</strong>.</li></ol>";
+    }
+    if (/Android/.test(ua)) {
+      return "<ol><li>Ouvrez le menu <strong>⋮</strong> du navigateur (en haut à droite).</li>" +
+             "<li>Choisissez <strong>« Installer l'application »</strong> ou " +
+             "<strong>« Ajouter à l'écran d'accueil »</strong>.</li></ol>";
+    }
+    if (/Firefox/.test(ua)) {
+      return "<p>Firefox sur ordinateur ne sait pas installer les applications web. " +
+             "Ouvrez cette page avec <strong>Chrome</strong> ou <strong>Edge</strong>, " +
+             "puis cliquez sur « Installer ».</p>";
+    }
+    if (/Safari/.test(ua) && !/Chrome|Chromium|Edg/.test(ua)) {
+      return "<ol><li>Dans le menu <strong>Fichier</strong> de Safari, choisissez " +
+             "<strong>« Ajouter au Dock »</strong>.</li></ol>";
+    }
+    return "<ol><li>Cliquez sur l'icône d'installation à droite de la barre d'adresse " +
+           "(un écran avec une flèche), ou ouvrez le menu <strong>⋮</strong> du navigateur.</li>" +
+           "<li>Choisissez <strong>« Installer K+ Studio »</strong>.</li></ol>";
+  }
+
+  window.addEventListener("beforeinstallprompt", (e) => {
+    e.preventDefault();               // on garde l'invitation pour notre bouton
+    invitationInstallation = e;
+    boutonInstaller.hidden = false;
+  });
+
+  window.addEventListener("appinstalled", () => {
+    invitationInstallation = null;
+    boutonInstaller.hidden = true;
+  });
+
+  boutonInstaller.addEventListener("click", async () => {
+    if (invitationInstallation) {
+      invitationInstallation.prompt();
+      const choix = await invitationInstallation.userChoice;
+      invitationInstallation = null;
+      if (choix.outcome === "accepted") boutonInstaller.hidden = true;
+      return;
+    }
+    instructionsInstallation.innerHTML = instructionsPourCetAppareil();
+    if (typeof aideInstallation.showModal === "function") aideInstallation.showModal();
+    else window.alert(instructionsInstallation.textContent);
+  });
+
+  function afficherEtatReseau() {
+    if (!navigator.onLine) {
+      etatHorsLigne.hidden = false;
+      etatHorsLigne.textContent = disponibleHorsLigne ? "Hors ligne (tout fonctionne)" : "Hors ligne";
+    } else if (disponibleHorsLigne) {
+      etatHorsLigne.hidden = false;
+      etatHorsLigne.textContent = "✓ Disponible hors ligne";
+    } else {
+      etatHorsLigne.hidden = true;
+    }
+  }
+  window.addEventListener("online", afficherEtatReseau);
+  window.addEventListener("offline", afficherEtatReseau);
+
+  function proposerMiseAJour(nouveau) {
+    boutonMiseAJour.hidden = false;
+    boutonMiseAJour.onclick = () => {
+      miseAJourDemandee = true;
+      ecrireStockage(CLES.code, code.value);   // rien n'est perdu au rechargement
+      ecrireStockage(CLES.nom, nomFichier.textContent);
+      ecrireStockage(CLES.entrees, entrees.value);
+      nouveau.postMessage("mettre-a-jour");
+    };
+  }
+
+  async function activerHorsLigne() {
+    if (!("serviceWorker" in navigator) || !window.isSecureContext) return;
+    try {
+      const enregistrement = await navigator.serviceWorker.register("service-worker.js");
+      if (enregistrement.waiting && navigator.serviceWorker.controller) {
+        proposerMiseAJour(enregistrement.waiting);
+      }
+      enregistrement.addEventListener("updatefound", () => {
+        const nouveau = enregistrement.installing;
+        if (!nouveau) return;
+        nouveau.addEventListener("statechange", () => {
+          if (nouveau.state === "installed" && navigator.serviceWorker.controller) {
+            proposerMiseAJour(nouveau);
+          }
+        });
+      });
+      navigator.serviceWorker.addEventListener("controllerchange", () => {
+        if (miseAJourDemandee) window.location.reload();
+      });
+      await navigator.serviceWorker.ready;     // fichiers mis en cache
+      disponibleHorsLigne = true;
+      afficherEtatReseau();
+    } catch (e) {
+      // Sans service worker, K+ Studio fonctionne quand même (en ligne).
+    }
+  }
+
+  if (!estInstalle() && "serviceWorker" in navigator && window.isSecureContext) {
+    boutonInstaller.hidden = false;
+  }
+  afficherEtatReseau();
+  activerHorsLigne();
+
   // --- Démarrage --------------------------------------------------------------------------
 
   const codeSauvegarde = lireStockage(CLES.code);
