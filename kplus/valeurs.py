@@ -102,8 +102,12 @@ def representer(v, imbrique: bool = False, _en_cours=None) -> str:
             return "[...]"                  # liste qui se contient elle-même
         en_cours.add(id(v))
         try:
-            return "[" + ", ".join(
-                representer(e, True, en_cours) for e in v) + "]"
+            # Boucle simple (pas de générateur) : la récursion reste
+            # entièrement en Python, ce qui la rend sûre aussi dans Pyodide.
+            morceaux = []
+            for element in v:
+                morceaux.append(representer(element, True, en_cours))
+            return "[" + ", ".join(morceaux) + "]"
         finally:
             en_cours.discard(id(v))
     if est_fonction(v):
@@ -120,7 +124,12 @@ def egal(a, b) -> bool:
     if type(a) is list:
         if a is b:
             return True
-        return len(a) == len(b) and all(egal(x, y) for x, y in zip(a, b))
+        if len(a) != len(b):
+            return False
+        for i in range(len(a)):           # boucle simple : voir representer()
+            if not egal(a[i], b[i]):
+                return False
+        return True
     if est_fonction(a):
         return a is b
     return a == b

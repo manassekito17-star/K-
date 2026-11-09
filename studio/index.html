@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>K+ Studio</title>
+  <link rel="stylesheet" href="studio.css">
+</head>
+<body>
+  <header class="barre">
+    <h1 class="logo">K<span>+</span> Studio</h1>
+    <div class="actions">
+      <button id="bouton-nouveau" type="button" title="Nouveau programme">Nouveau</button>
+      <button id="bouton-ouvrir" type="button" title="Ouvrir un fichier .kplus">Ouvrir</button>
+      <button id="bouton-enregistrer" type="button" title="Enregistrer (Ctrl+S)">Enregistrer</button>
+      <label class="choix-exemple">
+        <span class="visuellement-cache">Exemples</span>
+        <select id="choix-exemple" aria-label="Charger un exemple">
+          <option value="">Exemples…</option>
+        </select>
+      </label>
+      <input id="fichier" type="file" accept=".kplus,text/plain" hidden>
+    </div>
+    <div class="execution">
+      <button id="bouton-executer" class="principal" type="button" disabled
+              title="Exécuter (Ctrl+Entrée)">▶ Exécuter</button>
+      <button id="bouton-arreter" class="danger" type="button" disabled
+              title="Arrêter le programme">■ Arrêter</button>
+    </div>
+  </header>
+
+  <main class="espace">
+    <section class="panneau panneau-editeur" aria-label="Éditeur">
+      <div class="entete-panneau">
+        <span id="nom-fichier">programme.kplus</span>
+        <span id="diagnostic" class="diagnostic" role="status"></span>
+      </div>
+      <div class="editeur">
+        <div id="numeros" class="numeros" aria-hidden="true"></div>
+        <div class="zone">
+          <pre id="coloration" class="coloration" aria-hidden="true"></pre>
+          <textarea id="code" class="code" spellcheck="false" autocapitalize="off"
+                    autocomplete="off" wrap="off" aria-label="Code K+"></textarea>
+        </div>
+      </div>
+    </section>
+
+    <section class="panneau panneau-console" aria-label="Résultats">
+      <div class="entete-panneau">
+        <span>Console</span>
+        <button id="bouton-effacer" class="discret" type="button">Effacer</button>
+      </div>
+      <pre id="console" class="console" aria-live="polite"></pre>
+      <details class="entrees" id="bloc-entrees">
+        <summary>Entrée clavier pour <code>demander()</code></summary>
+        <p class="aide">Une réponse par ligne, utilisées dans l'ordre. Quand il n'y a
+          plus de réponse, <code>demander()</code> renvoie <code>nul</code>.</p>
+        <textarea id="entrees" rows="4" spellcheck="false"
+                  aria-label="Réponses pour demander()"></textarea>
+      </details>
+    </section>
+  </main>
+
+  <footer class="etat">
+    <span id="etat-moteur">Chargement du moteur K+…</span>
+    <span id="position">Ligne 1, colonne 1</span>
+  </footer>
+
+  <script src="coloration.js"></script>
+  <script src="studio.js"></script>
+</body>
+</html>

@@ -1,0 +1,256 @@
+/* K+ Studio — styles */
+
+:root {
+  --fond: #f6f7f9;
+  --surface: #ffffff;
+  --surface-2: #eef0f4;
+  --texte: #1d2330;
+  --texte-doux: #5b6475;
+  --bord: #d8dce4;
+  --accent: #2f5bd3;
+  --accent-texte: #ffffff;
+  --danger: #c4372f;
+  --succes: #1d7f4e;
+  --ligne-erreur: rgba(196, 55, 47, 0.12);
+  --k-motcle: #8a2fc4;
+  --k-valeur: #b3540a;
+  --k-native: #2f5bd3;
+  --k-nombre: #0f7b6c;
+  --k-texte: #a3361c;
+  --k-commentaire: #7a8293;
+  --k-symbole: #5b6475;
+  --k-inconnu: #c4372f;
+  --console-entree: #2f5bd3;
+  --console-systeme: #7a8293;
+  --police-code: ui-monospace, "Cascadia Code", "SFMono-Regular", Menlo, Consolas, "Liberation Mono", monospace;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --fond: #14171d;
+    --surface: #1b1f27;
+    --surface-2: #232834;
+    --texte: #e3e6ec;
+    --texte-doux: #9aa3b5;
+    --bord: #313848;
+    --accent: #6d8ff0;
+    --accent-texte: #0d1017;
+    --danger: #f07167;
+    --succes: #5cc98f;
+    --ligne-erreur: rgba(240, 113, 103, 0.16);
+    --k-motcle: #c792ea;
+    --k-valeur: #f2a65a;
+    --k-native: #82aaff;
+    --k-nombre: #6fd3c0;
+    --k-texte: #f0a58f;
+    --k-commentaire: #7f889b;
+    --k-symbole: #9aa3b5;
+    --k-inconnu: #f07167;
+    --console-entree: #82aaff;
+    --console-systeme: #7f889b;
+  }
+}
+
+* { box-sizing: border-box; }
+
+html, body { height: 100%; margin: 0; }
+
+body {
+  background: var(--fond);
+  color: var(--texte);
+  font: 15px/1.4 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  display: flex;
+  flex-direction: column;
+}
+
+button, select {
+  font: inherit;
+  color: var(--texte);
+  background: var(--surface);
+  border: 1px solid var(--bord);
+  border-radius: 6px;
+  padding: 6px 12px;
+  cursor: pointer;
+}
+button:hover:not(:disabled), select:hover { border-color: var(--accent); }
+button:disabled { opacity: 0.45; cursor: not-allowed; }
+button:focus-visible, select:focus-visible, textarea:focus-visible, summary:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+button.principal { background: var(--accent); color: var(--accent-texte); border-color: var(--accent); font-weight: 600; }
+button.danger:not(:disabled) { color: var(--danger); border-color: var(--danger); }
+button.discret { border: none; background: none; color: var(--texte-doux); padding: 2px 6px; }
+
+.visuellement-cache {
+  position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0);
+}
+
+/* --- Barre du haut --- */
+
+.barre {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
+  padding: 10px 16px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--bord);
+}
+.logo { font-size: 18px; margin: 0 8px 0 0; letter-spacing: 0.2px; }
+.logo span { color: var(--accent); }
+.actions, .execution { display: flex; flex-wrap: wrap; gap: 8px; }
+.execution { margin-left: auto; }
+
+/* --- Espace de travail --- */
+
+.espace {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+  gap: 12px;
+  padding: 12px 16px;
+}
+
+.panneau {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  background: var(--surface);
+  border: 1px solid var(--bord);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.entete-panneau {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 6px 12px;
+  font-size: 13px;
+  color: var(--texte-doux);
+  background: var(--surface-2);
+  border-bottom: 1px solid var(--bord);
+  min-height: 34px;
+}
+.diagnostic { text-align: right; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.diagnostic.ok { color: var(--succes); }
+.diagnostic.erreur { color: var(--danger); cursor: pointer; }
+
+/* --- Éditeur : zone de texte transparente posée sur le code coloré --- */
+
+.editeur {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  font: 14px/21px var(--police-code);
+  tab-size: 4;
+  overflow: hidden;
+}
+
+.numeros {
+  flex: none;
+  min-width: 48px;
+  padding: 12px 8px 12px 0;
+  text-align: right;
+  color: var(--texte-doux);
+  background: var(--surface-2);
+  border-right: 1px solid var(--bord);
+  overflow: hidden;
+  user-select: none;
+  white-space: pre;
+}
+.numeros .erreur { color: var(--danger); font-weight: 700; }
+
+.zone { position: relative; flex: 1; min-width: 0; }
+
+.coloration, .code {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  padding: 12px;
+  border: 0;
+  font: inherit;
+  tab-size: inherit;
+  white-space: pre;
+  overflow: auto;
+}
+.coloration { color: var(--texte); pointer-events: none; overflow: hidden; }
+.code {
+  resize: none;
+  background: transparent;
+  color: transparent;
+  caret-color: var(--texte);
+  outline: none;
+}
+.code::selection { background: rgba(47, 91, 211, 0.28); color: transparent; }
+
+.coloration .ligne { display: block; min-height: 21px; }
+.coloration .ligne.erreur { background: var(--ligne-erreur); box-shadow: inset 3px 0 0 var(--danger); }
+
+.k-motcle { color: var(--k-motcle); font-weight: 600; }
+.k-valeur { color: var(--k-valeur); }
+.k-native { color: var(--k-native); }
+.k-nombre { color: var(--k-nombre); }
+.k-texte { color: var(--k-texte); }
+.k-commentaire { color: var(--k-commentaire); font-style: italic; }
+.k-symbole { color: var(--k-symbole); }
+.k-inconnu { color: var(--k-inconnu); text-decoration: wavy underline; }
+
+/* --- Console --- */
+
+.console {
+  flex: 1;
+  min-height: 120px;
+  margin: 0;
+  padding: 12px;
+  overflow: auto;
+  font: 14px/1.5 var(--police-code);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.console .entree { color: var(--console-entree); font-weight: 600; }
+.console .systeme { color: var(--console-systeme); font-style: italic; }
+.console .erreur { color: var(--danger); }
+.console .lien-ligne { color: inherit; text-decoration: underline; cursor: pointer; background: none; border: 0; padding: 0; font: inherit; }
+
+.entrees { border-top: 1px solid var(--bord); padding: 8px 12px; font-size: 13px; }
+.entrees summary { cursor: pointer; color: var(--texte-doux); }
+.entrees .aide { margin: 6px 0; color: var(--texte-doux); }
+.entrees textarea {
+  width: 100%;
+  font: 13px/1.4 var(--police-code);
+  color: var(--texte);
+  background: var(--fond);
+  border: 1px solid var(--bord);
+  border-radius: 6px;
+  padding: 6px;
+  resize: vertical;
+}
+
+/* --- Barre d'état --- */
+
+.etat {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 4px 16px;
+  font-size: 12px;
+  color: var(--texte-doux);
+  background: var(--surface);
+  border-top: 1px solid var(--bord);
+}
+.etat .occupe::before { content: "● "; color: var(--accent); }
+.etat .pret::before { content: "● "; color: var(--succes); }
+.etat .echec { color: var(--danger); }
+
+/* --- Petits écrans --- */
+
+@media (max-width: 760px) {
+  .espace { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(260px, 1fr) minmax(220px, auto); }
+  .execution { margin-left: 0; width: 100%; }
+  .execution button { flex: 1; }
+  .barre { padding: 10px 16px; }
+}

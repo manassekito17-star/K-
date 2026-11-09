@@ -26,3 +26,23 @@ jobs:
           python -m pip install .
           kplus --version
           kplus exemples/bonjour.kplus
+
+  studio:
+    name: K+ Studio (navigateur)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Tests de la coloration syntaxique
+        run: node --test studio/tests/coloration.test.mjs
+      - name: Installation de Chromium (Playwright)
+        run: |
+          npm install --no-save playwright@1.63.0
+          npx playwright install --with-deps chromium
+      - name: Test de bout en bout dans le navigateur
+        run: node studio/tests/e2e.mjs

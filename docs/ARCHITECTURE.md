@@ -101,6 +101,12 @@ niveaux de parenthèses imbriquées sont garantis. La limite
 K+ (1000 appels) est contrôlée séparément par l'interpréteur et produit une
 `ErreurRecursion` claire.
 
+Dans le navigateur (Pyodide, K+ Studio), il n'y a pas de fils d'exécution :
+`pile.py` le détecte et relève directement la limite, ce qui y est sûr car les
+appels entre fonctions Python n'utilisent pas la pile du navigateur. Pour que
+cela reste vrai, les fonctions récursives sur les listes (`representer`,
+`egal`) utilisent des boucles simples plutôt que des générateurs.
+
 Ctrl+C : le fil principal reçoit l'interruption et demande à l'interpréteur de
 s'arrêter. L'interpréteur vérifie cette demande avant chaque instruction et à
 chaque tour de boucle.

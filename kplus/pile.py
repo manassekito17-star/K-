@@ -23,6 +23,12 @@ TAILLES_PILE = [255 * MIO, 128 * MIO, 64 * MIO]
 # assez), et suffit pour 1000 appels K+ imbriqués (environ 7 niveaux chacun).
 LIMITE_RECURSION = 16_384
 
+# Dans le navigateur (Pyodide, utilisé par K+ Studio), il n'y a pas de fils
+# d'exécution. Les appels entre fonctions Python n'y consomment pas la pile
+# du navigateur (Python ≥ 3.11) : la limite relevée y est donc sûre. Vérifié
+# par tests/studio (récursion de 999 appels, listes imbriquées 5000 fois).
+DANS_NAVIGATEUR = sys.platform == "emscripten"
+
 _local = threading.local()
 
 
@@ -72,10 +78,11 @@ def avec_grande_pile(fonction, interpreteur=None):
     ancienne_limite = sys.getrecursionlimit()
     try:
         sys.setrecursionlimit(max(ancienne_limite, LIMITE_RECURSION))
-        fil = _demarrer_fil(cible)
+        fil = None if DANS_NAVIGATEUR else _demarrer_fil(cible)
         if fil is None:
-            # Aucune grande pile possible : on garde la limite d'origine, sûre.
-            sys.setrecursionlimit(ancienne_limite)
+            if not DANS_NAVIGATEUR:
+                # Aucune grande pile possible : limite d'origine, sûre.
+                sys.setrecursionlimit(ancienne_limite)
             cible()
         else:
             try:

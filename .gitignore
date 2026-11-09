@@ -10,3 +10,5 @@ venv/
 htmlcov/
 .DS_Store
 Thumbs.db
+studio/dist/
+node_modules/

@@ -5,7 +5,7 @@
 | 1 | Spécification technique et grammaire | Terminée (décisions validées) |
 | 2 | Développement du moteur (interpréteur Python) | **Terminée** |
 | 3 | Tests et validation de K+ 0.1 | **Terminée** |
-| 4 | K+ Studio (éditeur) | À faire |
+| 4 | K+ Studio (éditeur web) | **Terminée** |
 | 5 | Évolution multiplateforme (paquets, compilateur natif) | À faire |
 | 6 | Bibliothèques avancées et intelligence artificielle | À faire |
 
@@ -88,9 +88,24 @@ Rapport complet : [`VALIDATION-0.1.md`](VALIDATION-0.1.md).
 - un bogue réel corrigé (plantage Windows + Python 3.10 sur récursion
   profonde).
 
-## Phase 4 — K+ Studio (à venir)
+## Phase 4 — K+ Studio (livrée)
 
-Éditeur officiel. Questions à trancher avec le responsable du projet avant de
-commencer : application de bureau ou application web, fonctionnalités de la
-première version (coloration syntaxique, bouton Exécuter, affichage des
-erreurs sur la ligne concernée...).
+Application web (choix du responsable du projet), dossier `studio/`.
+Documentation : [`studio/README.md`](../studio/README.md).
+
+- Exécute le vrai moteur K+ dans le navigateur grâce à Pyodide ;
+- éditeur avec coloration, vérification pendant la saisie, erreurs sur la
+  ligne concernée, Exécuter / Arrêter, exemples, ouverture et enregistrement
+  de fichiers `.kplus`, thèmes clair et sombre, mise en page mobile ;
+- testé dans un vrai navigateur (27 vérifications de bout en bout), aussi en
+  intégration continue.
+
+Changements du moteur nécessaires pour le navigateur (sans effet sur le
+langage) : `pile.py` reconnaît Pyodide, et l'affichage et la comparaison des
+listes utilisent des boucles simples (une liste imbriquée 5000 fois faisait
+planter Pyodide).
+
+## Phase 5 — Évolution multiplateforme (à venir)
+
+Pistes : mise en ligne de K+ Studio (GitHub Pages), paquet installable
+(PyPI), première étape vers un compilateur.

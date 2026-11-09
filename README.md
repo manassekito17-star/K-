@@ -27,7 +27,7 @@ commentaires et gestion des erreurs.
 | 1. Spécification et grammaire | Terminée |
 | 2. Moteur (interpréteur Python) | Terminée |
 | 3. Tests et validation de K+ 0.1 | Terminée ([rapport](docs/VALIDATION-0.1.md)) |
-| 4. K+ Studio | À faire |
+| 4. K+ Studio (éditeur web) | Terminée ([guide](studio/README.md)) |
 | 5. Multiplateforme | À faire |
 | 6. Bibliothèques avancées et IA | À faire |
 
@@ -52,6 +52,16 @@ kplus --aide
 ```
 
 Sans installation, depuis le dossier du projet : `python -m kplus exemples/bonjour.kplus`.
+
+## K+ Studio
+
+L'éditeur officiel, dans le navigateur :
+
+```
+python studio/construire.py --servir
+```
+
+Voir [studio/README.md](studio/README.md).
 
 ## Tests
 
