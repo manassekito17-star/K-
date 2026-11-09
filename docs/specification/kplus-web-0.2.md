@@ -39,7 +39,8 @@ saisie n'est pas un nombre.
 
 - **Pas de serveur ni de base de données.** Le site tourne entièrement dans le
   navigateur du visiteur : il n'enregistre rien et ne partage rien entre
-  visiteurs.
+  visiteurs. Les sites côté serveur, à la manière de PHP et Python, sont prévus
+  pour K+ 0.3 (voir [la feuille de route](../FEUILLE-DE-ROUTE.md)).
 - **Pas d'écriture de HTML ni de CSS bruts.** On n'utilise que les fonctions
   ci-dessous. C'est plus simple, et cela empêche les failles de sécurité
   (injection de code).

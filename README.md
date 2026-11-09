@@ -98,3 +98,4 @@ compte bancaire, grands nombres.
 - [Architecture du moteur](docs/ARCHITECTURE.md)
 - [Rapport de validation K+ 0.1](docs/VALIDATION-0.1.md)
 - [Plan de travail](docs/PLAN.md)
+- [Feuille de route des versions (proposition)](docs/FEUILLE-DE-ROUTE.md)
