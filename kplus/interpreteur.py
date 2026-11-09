@@ -24,8 +24,13 @@ class Interpreteur:
     def __init__(self, sortie=None, entree=None):
         self.sortie = sortie if sortie is not None else sys.stdout
         self._entree = entree if entree is not None else sys.stdin
-        self.globales = Environnement(natives=natives.NOMS_NATIFS)
+        # Noms protégés : fonctions natives, plus celles des bibliothèques
+        # activées par « utiliser » (ensemble partagé par tous les environnements).
+        self.noms_natifs = set(natives.NOMS_NATIFS)
+        self.globales = Environnement(natives=self.noms_natifs)
         natives.installer(self.globales)
+        self.page = None             # modèle de la page web (« utiliser web »)
+        self.noeud_appel = None      # appel de fonction native en cours
         self.profondeur = 0
         self.interrompu = False      # mis à vrai par Ctrl+C
         # Les entiers K+ sont de précision illimitée : on lève la limite
@@ -184,7 +189,7 @@ class Interpreteur:
 
     def _definition_fonction(self, n: ast.DefinitionFonction, env):
         for parametre in n.parametres:
-            if parametre in natives.NOMS_NATIFS:
+            if parametre in env.natives:
                 raise ErreurNom(
                     f"le paramètre « {parametre} » porte le nom d'une fonction "
                     f"native de K+", conseil="choisissez un autre nom")
@@ -209,6 +214,28 @@ class Interpreteur:
                 gestion.declarer(n.nom_erreur, erreur.message)
             for instruction in n.gestionnaire:
                 self.executer(instruction, gestion)
+
+    def _utiliser(self, n: ast.Utiliser, env):
+        if n.bibliotheque != "web":
+            raise ErreurNom(f"bibliothèque « {n.bibliotheque} » inconnue",
+                            n.ligne, n.colonne, "bibliothèque disponible : web")
+        if self.page is not None:
+            return                                   # déjà activée
+        from . import web
+        for nom in web.NOMS_WEB:
+            if nom in self.globales.valeurs:
+                raise ErreurNom(
+                    f"« {nom} » est déjà utilisé dans ce programme, mais c'est aussi "
+                    f"une fonction de la bibliothèque web", n.ligne, n.colonne,
+                    f"renommez « {nom} », ou placez « utiliser web » au tout début du programme")
+        self.page = web.Page()
+        for nom, fonction in web.fonctions_natives().items():
+            self.globales.definir_native(nom, fonction)
+            self.noms_natifs.add(nom)
+
+    def appeler_action(self, fonction, arguments, noeud):
+        """Appelle une action web (clic, saisie, minuterie) avec une grande pile."""
+        return avec_grande_pile(lambda: self.appeler(fonction, arguments, noeud), self)
 
     def _lever(self, n: ast.Lever, env):
         message = self.evaluer(n.valeur, env)
@@ -272,6 +299,7 @@ class Interpreteur:
                 raise ErreurType(
                     f"la fonction « {fonction.nom} » attend {attendu}, "
                     f"mais en a reçu {nombre}")
+            self.noeud_appel = noeud
             return fonction.implementation(self, arguments)
 
         if type(fonction) is not FonctionUtilisateur:
@@ -320,6 +348,7 @@ INSTRUCTIONS = {
     ast.Continuer: Interpreteur._continuer,
     ast.Essayer: Interpreteur._essayer,
     ast.Lever: Interpreteur._lever,
+    ast.Utiliser: Interpreteur._utiliser,
 }
 
 EXPRESSIONS = {

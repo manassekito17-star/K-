@@ -26,6 +26,7 @@ MOTS_CLES = frozenset({
     "essayer", "attraper", "lever",
     "et", "ou", "non",
     "vrai", "faux", "nul",
+    "utiliser",
 })
 
 # Formes accentuées acceptées comme alias -> forme officielle.

@@ -150,5 +150,10 @@ class Lever(Noeud):
 
 
 @dataclass(eq=False)
+class Utiliser(Noeud):
+    bibliotheque: str                # « utiliser web »
+
+
+@dataclass(eq=False)
 class Programme(Noeud):
     instructions: list

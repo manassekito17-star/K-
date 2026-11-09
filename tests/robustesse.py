@@ -9,6 +9,7 @@ Utilisation : python tests/robustesse.py [nombre] [graine]
 
 import io
 import random
+import re
 import sys
 import threading
 from pathlib import Path
@@ -31,6 +32,9 @@ MORCEAUX = [
     "“é”", "(", ")", "[", "]", ",", "=", "==", "!=", "<", "<=", ">", ">=",
     "+", "-", "*", "/", "%", "^", "\n", "\n", "\n", " ", "#", "/*", "*/",
     "\\", '"', "@", ";", ".", "\t", "\r\n", "﻿", "é", "_",
+    "utiliser", "web", "utiliser web\n", "titre", "bouton", "champ", "valeur",
+    "liste", "ajouter_ligne", "zone", "placer", "couleur", '"rouge"', "supprimer",
+    "toutes_les", "quand_clic", "changer_texte", "lien", '"https://x.org"',
 ]
 
 VALEURS = ["0", "1", "-3", "2.5", "0.0", "1e300", '"ab"', '""', "vrai", "faux",
@@ -46,6 +50,8 @@ def programmes_de_reference():
                for p in sorted((RACINE / "exemples").glob("*.kplus"))]
     sources += [p.read_text(encoding="utf-8")
                 for p in sorted((RACINE / "tests" / "conformite").glob("*.kplus"))]
+    specification_web = (RACINE / "docs" / "specification" / "kplus-web-0.2.md").read_text(encoding="utf-8")
+    sources += re.findall(r"```kplus\n(.*?)```", specification_web, re.S)
     return sources
 
 
@@ -108,6 +114,21 @@ class Bogue(Exception):
     pass
 
 
+def simuler_visiteur(interp, source, alea=random.Random(0)):
+    """Clics, saisies et minuteries au hasard sur la page d'un programme web."""
+    from kplus import web
+    for _ in range(15):
+        elements = list(interp.page.elements.values())
+        if not elements:
+            return
+        e = alea.choice(elements)
+        champs = {c.id: alea.choice(["", "42", "abc", "3.5", "<b>x</b>", "é" * 50])
+                  for c in elements if c.genre == "champ"}
+        web.declencher(interp, e.id, alea.choice(["clic", "change", "minuterie", "inconnu"]),
+                       champs, source)
+        interp.page.prendre_commandes()
+
+
 def essayer_programme(source, executer=True):
     """Renvoie le résultat ('ok', 'erreur K+'...) ; lève Bogue sinon."""
     try:
@@ -125,6 +146,8 @@ def essayer_programme(source, executer=True):
     minuteur.start()
     try:
         interp.executer_programme(programme)
+        if interp.page is not None:
+            simuler_visiteur(interp, source)
         return "ok"
     except ErreurKPlus as e:
         kplus.formater_erreur(e, source)

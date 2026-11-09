@@ -113,12 +113,23 @@ class EntreeStudio:
         return ligne + "\n"
 
 
+# Programme web en cours (« utiliser web ») : il reste vivant entre deux
+# événements (clics, saisies, minuteries) pour garder ses variables.
+_session = None
+
+
 def executer(source: str, entree: str, envoyer) -> str:
     """Analyse puis exécute le programme. `envoyer(genre, texte)` reçoit la
-    sortie au fur et à mesure (genre : "sortie", "entree" ou "systeme")."""
+    sortie au fur et à mesure (genre : "sortie", "entree" ou "systeme").
+
+    Pour un programme web, le résultat contient aussi "web": true et les
+    "commandes" qui construisent la page (voir kplus/web.py)."""
+    global _session
+    _session = None
     debut = time.monotonic()
     sortie = SortieStudio(envoyer)
     resultat = {"statut": "ok"}
+    interpreteur = None
     try:
         programme = kplus.analyser(source)
         interpreteur = kplus.Interpreteur(sortie, EntreeStudio(entree, sortie))
@@ -129,5 +140,29 @@ def executer(source: str, entree: str, envoyer) -> str:
         pass
     finally:
         sortie.vider()
+    if interpreteur is not None and interpreteur.page is not None:
+        resultat["web"] = True
+        resultat["commandes"] = interpreteur.page.prendre_commandes()
+        _session = (interpreteur, source)
     resultat["duree_ms"] = round((time.monotonic() - debut) * 1000)
+    return json.dumps(resultat)
+
+
+def evenement(identifiant: str, genre: str, valeurs: str, envoyer) -> str:
+    """Transmet un événement de la page (clic, change, minuterie) au programme
+    web en cours. `valeurs` : JSON du contenu actuel des champs."""
+    from kplus import web
+    if _session is None:
+        return json.dumps({"statut": "ok", "commandes": []})
+    interpreteur, source = _session
+    sortie = SortieStudio(envoyer)
+    interpreteur.sortie = sortie
+    try:
+        erreur = web.declencher(interpreteur, identifiant, genre, json.loads(valeurs or "{}"), source)
+    finally:
+        sortie.vider()
+    resultat = {"statut": "erreur" if erreur else "ok",
+                "commandes": interpreteur.page.prendre_commandes()}
+    if erreur:
+        resultat["texte_erreur"] = erreur
     return json.dumps(resultat)

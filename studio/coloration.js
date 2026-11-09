@@ -19,6 +19,7 @@
     "essayer", "attraper", "lever",
     "et", "ou", "non",
     "vrai", "faux", "nul",
+    "utiliser",
   ];
   const VALEURS = new Set(["vrai", "faux", "nul"]);
   const NATIVES = [

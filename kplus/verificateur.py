@@ -32,6 +32,12 @@ class Verificateur:
                     conseil = "pour donner une valeur, écrivez = (un seul signe égal)"
                 raise ErreurSyntaxe("cette expression n'a aucun effet",
                                     n.ligne, n.colonne, conseil)
+        elif isinstance(n, ast.Utiliser):
+            if not global_:
+                raise ErreurSyntaxe(
+                    "« utiliser » doit être écrit au niveau principal du programme, "
+                    "pas dans un bloc", n.ligne, n.colonne,
+                    "placez « utiliser web » au début du programme")
         elif isinstance(n, ast.Retourner):
             if not dans_fonction:
                 raise ErreurSyntaxe(

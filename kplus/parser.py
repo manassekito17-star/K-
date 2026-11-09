@@ -154,6 +154,10 @@ class Parser:
             if mot == "continuer":
                 self.avancer()
                 return ast.Continuer(jeton.ligne, jeton.colonne)
+            if mot == "utiliser":
+                self.avancer()
+                nom = self.nom_declare("nom de bibliothèque")
+                return ast.Utiliser(jeton.ligne, jeton.colonne, nom.valeur)
             if mot == "lever":
                 self.avancer()
                 return ast.Lever(jeton.ligne, jeton.colonne, self.expression())

@@ -77,7 +77,7 @@
       "patterns": [
         {
           "name": "keyword.control.kplus",
-          "match": "(?<![\\p{L}\\p{M}\\p{N}_])(si|alors|sinon|fin|tant|que|faire|pour|chaque|dans|de|à|pas|arreter|arrêter|continuer|retourner|essayer|attraper|lever)(?![\\p{L}\\p{M}\\p{N}_])"
+          "match": "(?<![\\p{L}\\p{M}\\p{N}_])(si|alors|sinon|fin|tant|que|faire|pour|chaque|dans|de|à|pas|arreter|arrêter|continuer|retourner|essayer|attraper|lever|utiliser)(?![\\p{L}\\p{M}\\p{N}_])"
         },
         {
           "name": "storage.type.kplus",

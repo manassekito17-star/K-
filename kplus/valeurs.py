@@ -34,6 +34,29 @@ class FonctionNative:
         self.implementation = implementation
 
 
+class Element:
+    """Morceau d'une page web (« utiliser web ») : titre, bouton, champ…
+    Le modèle de la page est géré par kplus/web.py."""
+
+    __slots__ = ("id", "genre", "texte", "valeur", "etiquette", "adresse",
+                 "description", "parent", "enfants", "actions", "supprime",
+                 "ligne")
+
+    def __init__(self, ident, genre, texte="", ligne=None):
+        self.id = ident
+        self.genre = genre              # titre, bouton, champ, liste, ligne…
+        self.texte = texte
+        self.valeur = ""                # contenu d'un champ
+        self.etiquette = ""
+        self.adresse = ""
+        self.description = ""
+        self.parent = None
+        self.enfants = []
+        self.actions = {}               # « clic », « change », « minuterie »
+        self.supprime = False
+        self.ligne = ligne              # ligne du programme qui l'a créé
+
+
 def est_nombre(v) -> bool:
     return type(v) is int or type(v) is float
 
@@ -58,10 +81,13 @@ def nom_type(v) -> str:
         return "liste"
     if est_fonction(v):
         return "fonction"
+    if t is Element:
+        return "élément"
     raise TypeError(f"valeur Python inattendue : {v!r}")  # bogue interne
 
 
 ARTICLES = {
+    "élément": "un élément",
     "booléen": "un booléen", "entier": "un entier", "décimal": "un décimal",
     "texte": "un texte", "nul": "nul", "liste": "une liste",
     "fonction": "une fonction",
@@ -112,6 +138,9 @@ def representer(v, imbrique: bool = False, _en_cours=None) -> str:
             en_cours.discard(id(v))
     if est_fonction(v):
         return f"<fonction {v.nom}>"
+    if t is Element:
+        nom = v.etiquette if v.genre == "champ" else v.texte
+        return f"<élément {v.genre} « {nom} »>" if nom else f"<élément {v.genre}>"
     raise TypeError(f"valeur Python inattendue : {v!r}")  # bogue interne
 
 

@@ -109,6 +109,13 @@ def executer_fichier(chemin):
     except Exception as exc:  # bogue de l'interpréteur
         return erreur_interne(exc)
     sys.stdout.flush()
+    if interpreteur.page is not None:
+        visibles = sum(1 for e in interpreteur.page.elements.values()
+                       if e.genre != "minuterie" and not e.supprime)
+        ecrire_erreur(
+            f"Ce programme crée une page web ({visibles} élément(s)) : un terminal ne peut pas "
+            f"l'afficher.\nPour la voir : ouvrez-la dans K+ Studio, ou créez le site avec "
+            f"« kplus --site {chemin} ».")
     return SUCCES
 
 
