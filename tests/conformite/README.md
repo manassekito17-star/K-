@@ -1,8 +1,10 @@
 # Cas de test de conformité K+ 0.1
 
-> **Statut : non exécutés.** Ces cas décrivent le comportement attendu défini par
-> la [spécification](../../docs/specification/specification-kplus-0.1.md).
-> Ils seront lancés automatiquement en Phase 3, quand le moteur existera.
+Ces cas décrivent le comportement attendu défini par la
+[spécification](../../docs/specification/specification-kplus-0.1.md).
+**État : 48/48 réussis** avec l'interpréteur de référence.
+
+Lancer les cas : `python tests/conformite_lanceur.py`
 
 ## Format
 

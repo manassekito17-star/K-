@@ -1,9 +1,9 @@
 # Spécification technique officielle — K+ 0.1
 
-> **Statut : PROJET DE SPÉCIFICATION (Phase 1).**
-> Ce document décrit ce que K+ 0.1 *devra* faire. **Aucun moteur K+ n'existe
-> encore** : rien de ce qui est écrit ici n'est exécutable tant que la Phase 2
-> (développement de l'interpréteur) et la Phase 3 (tests) ne sont pas terminées.
+> **Statut : spécification de référence de K+ 0.1.**
+> L'interpréteur de référence (dossier `kplus/`, Phase 2) implémente ce
+> document ; les 48 cas de conformité de la section 12 passent. La validation
+> complète de la version 0.1 est l'objet de la Phase 3.
 
 | Élément | Valeur |
 |---|---|
@@ -595,7 +595,7 @@ afficher(compteur())   # 2
 | Fonction | Rôle | Erreurs possibles |
 |---|---|---|
 | `afficher(v1, v2, ...)` | Écrit les valeurs séparées par un espace, puis une fin de ligne. `afficher()` écrit une ligne vide. Renvoie `nul`. | — |
-| `demander(invite)` | Affiche `invite` (un texte, sans fin de ligne), lit une ligne au clavier et la renvoie comme `texte` (sans la fin de ligne). Fin d'entrée : renvoie `nul`. | `ErreurType` si `invite` n'est pas un texte |
+| `demander(invite)` | Affiche `invite` (un texte, sans fin de ligne ; facultatif : `demander()`), lit une ligne au clavier et la renvoie comme `texte` (sans la fin de ligne). Fin d'entrée : renvoie `nul`. | `ErreurType` si `invite` n'est pas un texte |
 | `texte(v)` | Représentation textuelle de `v` (voir §4.2). | — |
 | `entier(v)` | Décimal → entier tronqué vers zéro (`entier(-3.9)` = `-3`). Texte d'un entier (espaces autour tolérés, signe `-` ou `+` permis) → entier. Entier → lui-même. | `ErreurValeur` (texte invalide), `ErreurType` (autre type) |
 | `decimal(v)` (alias `décimal`) | Entier ou texte d'un nombre (`"3.5"`, `"2"`, `"1e3"`) → décimal. | `ErreurValeur`, `ErreurType` |
@@ -639,10 +639,10 @@ reste affiché.
 Toutes les erreurs sont écrites sur la **sortie d'erreur** (*stderr*) au format :
 
 ```
-Erreur de type (ligne 3, colonne 18) : impossible d'utiliser + entre un texte et un entier.
-   3 | afficher("Âge : " + age)
-     |                  ^
-Conseil : convertissez le nombre avec texte(age).
+Erreur de type (ligne 2, colonne 19) : impossible d'utiliser + entre un texte et un entier
+   2 | afficher("Âge : " + age)
+     |                   ^
+Conseil : convertissez la valeur en texte avec texte(...)
 ```
 
 - **Ligne et colonne** commencent à 1. La colonne compte les caractères
@@ -650,13 +650,19 @@ Conseil : convertissez le nombre avec texte(age).
 - Si l'erreur survient dans une fonction, la pile d'appels est ajoutée :
 
 ```
+Erreur de division par zéro (ligne 2, colonne 17) : division par zéro
+   2 |     retourner a / b
+     |                 ^
 Pile d'appels (du plus récent au plus ancien) :
-  dans diviser, ligne 2
-  appelée ligne 6
+  dans « diviser », appelée ligne 5
 ```
 
+- Les appels identiques consécutifs (récursion) sont regroupés :
+  `dans « f », appelée ligne 2 (× 999)`. Au-delà de 10 lignes, le milieu de
+  la pile est résumé.
+
 - Pour un bloc jamais fermé, l'erreur pointe la **ligne d'ouverture** du bloc :
-  `Erreur de syntaxe (ligne 2, colonne 1) : le bloc « si » ouvert ici n'est jamais fermé par « fin ».`
+  `Erreur de syntaxe (ligne 2, colonne 1) : le bloc « si » ouvert ici n'est jamais fermé par « fin »`
 - Pour `ErreurUtilisateur`, le message est celui donné à `lever`.
 
 ### 9.3 Message transmis à `attraper`
@@ -669,7 +675,8 @@ catégorie ni numéro de ligne. Exemple : pour `10 / 0`, le texte
 
 ## 10. Interface en ligne de commande
 
-Commande prévue : `kplus` (installée en Phase 2 ; d'ici là, elle n'existe pas).
+Commande : `kplus` (installée avec `pip install .`, voir le README), ou
+`python -m kplus` sans installation.
 
 | Commande | Effet |
 |---|---|
@@ -686,6 +693,7 @@ Commande prévue : `kplus` (installée en Phase 2 ; d'ici là, elle n'existe pas
 | `0` | Succès |
 | `1` | Erreur K+ (lexicale, syntaxe ou exécution non attrapée) |
 | `2` | Mauvaise utilisation de la commande (fichier introuvable, option inconnue) |
+| `3` | Erreur interne de l'interpréteur (bogue de K+, à signaler) |
 | `130` | Interruption par l'utilisateur (Ctrl+C) |
 
 Le fichier source peut avoir n'importe quelle extension, mais `.kplus` est
@@ -718,11 +726,10 @@ programme `.kplus` accompagné de sa sortie attendue (`.sortie`) et, s'il doit
 échouer, de l'erreur attendue (`.erreur`). Le format est décrit dans
 [`tests/conformite/README.md`](../../tests/conformite/README.md).
 
-Ils seront exécutés **automatiquement** en Phase 3 par un lanceur de tests ;
-en Phase 1, ils ne servent que de référence : **aucun n'a encore été exécuté**,
-puisque le moteur n'existe pas.
+Ils sont exécutés **automatiquement** par `tests/conformite_lanceur.py`
+(et par `python -m unittest`). État actuel : **48/48 réussis**.
 
-Couverture prévue par fonctionnalité du cahier des charges :
+Couverture par fonctionnalité du cahier des charges :
 
 | # | Fonctionnalité | Cas |
 |---|---|---|
@@ -738,5 +745,5 @@ Couverture prévue par fonctionnalité du cahier des charges :
 | 10 | Gestion des erreurs | 033, 034, 035, 036 (et tous les cas `.erreur`) |
 | — | Programme complet du cahier des charges | 040 |
 
-En plus de ces cas « boîte noire », la Phase 2 ajoutera des **tests unitaires**
-pour chaque composant (lexer, parser, interpréteur).
+En plus de ces cas « boîte noire », des **tests unitaires** couvrent chaque
+composant (lexer, parser, interpréteur, erreurs, ligne de commande).
