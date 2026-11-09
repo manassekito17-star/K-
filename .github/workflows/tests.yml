@@ -1,0 +1,28 @@
+name: Tests K+
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  tests:
+    name: ${{ matrix.os }} / Python ${{ matrix.python }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python: ["3.10", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Tests unitaires, conformité, exemples et robustesse
+        run: python -m unittest -v
+      - name: Installation de la commande kplus
+        run: |
+          python -m pip install .
+          kplus --version
+          kplus exemples/bonjour.kplus
