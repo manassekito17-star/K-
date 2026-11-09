@@ -1,0 +1,2 @@
+variable age = 20
+afficher("Âge : " + age)

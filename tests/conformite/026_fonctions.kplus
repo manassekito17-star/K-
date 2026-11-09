@@ -1,0 +1,12 @@
+fonction additionner(a, b)
+    retourner a + b
+fin
+variable resultat = additionner(10, 20)
+afficher(resultat)
+fonction appliquer(f, x)
+    retourner f(x)
+fin
+fonction double(x)
+    retourner x * 2
+fin
+afficher(appliquer(double, 21))

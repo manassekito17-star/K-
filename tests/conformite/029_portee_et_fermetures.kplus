@@ -1,0 +1,21 @@
+variable x = "global"
+si vrai alors
+    variable x = "bloc"
+    afficher(x)
+fin
+afficher(x)
+fonction creer_compteur()
+    variable n = 0
+    fonction suivant()
+        n = n + 1
+        retourner n
+    fin
+    retourner suivant
+fin
+variable compteur = creer_compteur()
+afficher(compteur())
+afficher(compteur())
+si vrai alors
+    variable interne = 1
+fin
+afficher(interne)

@@ -1,0 +1,4 @@
+constante PI = 3.14
+afficher(PI)
+PI = 3
+afficher("jamais affiché")

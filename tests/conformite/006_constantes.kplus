@@ -1,0 +1,5 @@
+constante PI = 3.14159
+constante NOMS = ["a"]
+ajouter(NOMS, "b")
+afficher(PI)
+afficher(NOMS)

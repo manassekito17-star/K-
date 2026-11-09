@@ -1,0 +1,17 @@
+pour i de 1 à 10 faire
+    si i == 2 alors
+        continuer
+    fin
+    si i == 5 alors
+        arreter
+    fin
+    afficher(i)
+fin
+variable n = 0
+tant que vrai faire
+    n = n + 1
+    si n == 3 alors
+        arrêter
+    fin
+fin
+afficher(n)

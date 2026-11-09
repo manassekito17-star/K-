@@ -1,0 +1,4 @@
+fonction additionner(a, b)
+    retourner a + b
+fin
+afficher(additionner(1))

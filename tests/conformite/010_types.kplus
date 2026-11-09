@@ -1,0 +1,11 @@
+afficher(type(42))
+afficher(type(3.5))
+afficher(type("abc"))
+afficher(type(vrai))
+afficher(type(nul))
+afficher(type([1, 2]))
+afficher(type(afficher))
+fonction f()
+fin
+afficher(type(f))
+afficher(f)

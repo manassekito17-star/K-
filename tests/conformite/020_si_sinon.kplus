@@ -1,0 +1,6 @@
+variable age = 15
+si age >= 18 alors
+    afficher("Tu es majeur")
+sinon
+    afficher("Tu es mineur")
+fin

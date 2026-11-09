@@ -1,0 +1,5 @@
+afficher(3 > 2, 3 < 2, 3 >= 3, 3 <= 2)
+afficher(1 == 1.0, 1 != 2, 1 == "1")
+afficher("abc" < "abd", "a" == "a")
+afficher([1, 2] == [1, 2], [1] == [2])
+afficher(nul == nul, nul == faux)

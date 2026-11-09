@@ -1,0 +1,4 @@
+variable x = 1
+si x alors
+    afficher("non")
+fin

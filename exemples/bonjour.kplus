@@ -1,0 +1,17 @@
+afficher("Bienvenue dans K+")
+
+variable nom = "Manassé"
+variable age = 20
+
+si age >= 18 alors
+    afficher("Tu es majeur")
+sinon
+    afficher("Tu es mineur")
+fin
+
+fonction additionner(a, b)
+    retourner a + b
+fin
+
+variable resultat = additionner(10, 20)
+afficher(resultat)

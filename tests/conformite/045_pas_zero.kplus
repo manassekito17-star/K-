@@ -1,0 +1,3 @@
+pour i de 1 à 5 pas 0 faire
+    afficher(i)
+fin

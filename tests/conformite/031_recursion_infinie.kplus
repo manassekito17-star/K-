@@ -1,0 +1,4 @@
+fonction sans_fin(n)
+    retourner sans_fin(n + 1)
+fin
+sans_fin(0)

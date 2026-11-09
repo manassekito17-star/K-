@@ -1,0 +1,3 @@
+afficher("ne doit PAS s'afficher : erreur de syntaxe")
+si vrai alors
+    afficher("x")

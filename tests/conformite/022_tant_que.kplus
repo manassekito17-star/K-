@@ -1,0 +1,6 @@
+variable i = 1
+tant que i <= 3 faire
+    afficher(i)
+    i = i + 1
+fin
+afficher("fin :", i)

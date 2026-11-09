@@ -1,0 +1,5 @@
+afficher(vrai et faux, vrai ou faux, non vrai)
+afficher(non 1 == 2)
+# court-circuit : la division par zéro n'est jamais évaluée
+afficher(faux et 1 / 0 == 1)
+afficher(vrai ou 1 / 0 == 1)

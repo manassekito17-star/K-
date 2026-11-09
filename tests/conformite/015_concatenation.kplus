@@ -1,0 +1,4 @@
+variable nom = "Manassé"
+afficher("Bonjour " + nom + " !")
+afficher([1, 2] + [3])
+afficher("Âge : " + texte(20))

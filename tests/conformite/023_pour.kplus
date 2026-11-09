@@ -1,0 +1,16 @@
+pour i de 1 à 3 faire
+    afficher(i)
+fin
+pour i de 0 à 6 pas 2 faire
+    afficher(i)
+fin
+pour i de 3 à 1 pas -1 faire
+    afficher(i)
+fin
+pour i de 5 à 1 faire
+    afficher("jamais")
+fin
+pour i de 1 à 3 faire
+    i = i * 10
+    afficher(i)
+fin

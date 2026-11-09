@@ -1,0 +1,3 @@
+afficher("début")
+lever "arrêt demandé"
+afficher("jamais")

@@ -1,0 +1,9 @@
+fonction saluer(nom)
+    afficher("Bonjour " + nom)
+fin
+variable r = saluer("Awa")
+afficher(r)
+fonction vide()
+    retourner
+fin
+afficher(vide())

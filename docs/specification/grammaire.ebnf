@@ -1,0 +1,191 @@
+(* ==========================================================================
+   Grammaire formelle de K+ 0.1  —  notation EBNF (ISO/IEC 14977 simplifiée)
+
+   Statut : spécification (Phase 1). Aucun analyseur n'implémente encore
+   cette grammaire.
+
+   Conventions :
+     "mot"        terminal littéral (mot-clé ou symbole)
+     NOM          jeton produit par l'analyse lexicale (voir partie A)
+     { x }        zéro, une ou plusieurs répétitions de x
+     [ x ]        x facultatif
+     x | y        alternative
+     (* ... *)    commentaire
+   ========================================================================== *)
+
+
+(* ==========================================================================
+   PARTIE A — JETONS (règles lexicales)
+   Le texte source est d'abord normalisé en Unicode NFC.
+   ========================================================================== *)
+
+(* Les espaces et tabulations séparent les jetons et sont ignorés.
+   Les commentaires sont ignorés :
+     "#" suivi de tout caractère jusqu'à la fin de ligne ;
+     "/*" ... "*/" sur une ou plusieurs lignes, non imbriqués.
+   Une fin de ligne produit un jeton NL, SAUF à l'intérieur de "(" ")" ou
+   "[" "]" où elle est ignorée. Plusieurs NL consécutifs comptent pour un. *)
+
+NL            = "\n" | "\r\n" | "\r" ;
+
+lettre        = ? toute lettre Unicode (catégories L*) ? ;
+chiffre       = "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" ;
+
+IDENT         = ( lettre | "_" ) , { lettre | chiffre | "_" } ;
+                (* sauf les mots-clés réservés ci-dessous *)
+
+chiffres      = chiffre , { [ "_" ] , chiffre } ;
+ENTIER        = "0" | chiffre_non_nul , { [ "_" ] , chiffre } ;
+chiffre_non_nul = "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" ;
+
+exposant      = ( "e" | "E" ) , [ "+" | "-" ] , chiffres ;
+DECIMAL       = ENTIER , "." , chiffres , [ exposant ]
+              | ENTIER , exposant ;
+
+echappement   = "\" , ( "n" | "t" | '"' | "\" ) ;
+car_texte_droit = ? tout caractère sauf '"', "\" et fin de ligne ? ;
+car_texte_typo  = ? tout caractère sauf "”", "\" et fin de ligne ? ;
+TEXTE         = '"' , { car_texte_droit | echappement } , '"'
+              | "“" , { car_texte_typo  | echappement } , "”" ;
+
+(* Mots-clés réservés (en minuscules ; un alias accentué est indiqué entre
+   parenthèses) :
+     variable constante fonction retourner
+     si alors sinon fin
+     tant que faire pour chaque dans de à pas
+     arreter (arrêter) continuer
+     essayer attraper lever
+     et ou non
+     vrai faux nul                                                       *)
+
+(* Symboles :
+     ( ) [ ] , = + - * / % ^ == != < <= > >=                             *)
+
+
+(* ==========================================================================
+   PARTIE B — SYNTAXE
+   ========================================================================== *)
+
+programme       = { NL } , { instruction , fin_instr } , EOF ;
+
+fin_instr       = NL , { NL } | EOF ;
+
+(* Un bloc est une suite d'instructions, chacune terminée par NL.
+   Il s'arrête au premier mot-clé de fermeture rencontré en début
+   d'instruction : "fin", "sinon" ou "attraper" selon le contexte. *)
+bloc            = { NL } , { instruction , NL , { NL } } ;
+
+instruction     = declaration_variable
+                | declaration_constante
+                | definition_fonction
+                | instr_si
+                | instr_tant_que
+                | instr_pour
+                | instr_pour_chaque
+                | instr_essayer
+                | instr_retourner
+                | instr_lever
+                | "arreter" | "arrêter"
+                | "continuer"
+                | affectation
+                | instr_expression ;
+
+(* ---------- Déclarations ---------- *)
+
+declaration_variable  = "variable"  , IDENT , "=" , expression ;
+declaration_constante = "constante" , IDENT , "=" , expression ;
+
+(* ---------- Affectation ----------
+   Ambiguïté levée par l'analyseur : il lit d'abord une expression ; si le
+   jeton suivant est "=", l'expression lue doit être une "cible" (sinon
+   ErreurSyntaxe) et l'instruction devient une affectation. *)
+affectation     = cible , "=" , expression ;
+cible           = IDENT , { "[" , expression , "]" } ;
+
+(* ---------- Instruction-expression ----------
+   Contrainte sémantique : en mode fichier, l'expression doit être un appel
+   de fonction (son dernier suffixe est un appel). *)
+instr_expression = expression ;
+
+(* ---------- Conditions ---------- *)
+
+instr_si        = "si" , expression , "alors" , NL , bloc ,
+                  { "sinon" , "si" , expression , "alors" , NL , bloc } ,
+                  [ "sinon" , NL , bloc ] ,
+                  "fin" ;
+
+(* ---------- Boucles ---------- *)
+
+instr_tant_que  = "tant" , "que" , expression , "faire" , NL , bloc , "fin" ;
+
+instr_pour      = "pour" , IDENT , "de" , expression , "à" , expression ,
+                  [ "pas" , expression ] , "faire" , NL , bloc , "fin" ;
+
+instr_pour_chaque = "pour" , "chaque" , IDENT , "dans" , expression ,
+                    "faire" , NL , bloc , "fin" ;
+
+(* Contrainte : "arreter"/"continuer" uniquement à l'intérieur d'une boucle,
+   sans traverser une définition de fonction. *)
+
+(* ---------- Fonctions ---------- *)
+
+definition_fonction = "fonction" , IDENT , "(" , [ parametres ] , ")" ,
+                      NL , bloc , "fin" ;
+parametres      = IDENT , { "," , IDENT } ;
+
+(* Contrainte : "retourner" uniquement dans le corps d'une fonction.
+   L'expression est absente si "retourner" est suivi d'une fin de ligne. *)
+instr_retourner = "retourner" , [ expression ] ;
+
+(* ---------- Erreurs ---------- *)
+
+instr_essayer   = "essayer" , NL , bloc ,
+                  "attraper" , [ IDENT ] , NL , bloc ,
+                  "fin" ;
+
+instr_lever     = "lever" , expression ;
+
+
+(* ==========================================================================
+   PARTIE C — EXPRESSIONS (de la priorité la plus faible à la plus forte)
+   ========================================================================== *)
+
+expression      = expr_ou ;
+
+expr_ou         = expr_et , { "ou" , expr_et } ;
+
+expr_et         = expr_non , { "et" , expr_non } ;
+
+expr_non        = "non" , expr_non
+                | comparaison ;
+
+(* Non associatif : au plus UN opérateur de comparaison.
+   "a < b < c" est une ErreurSyntaxe. *)
+comparaison     = addition , [ op_comparaison , addition ] ;
+op_comparaison  = "==" | "!=" | "<" | "<=" | ">" | ">=" ;
+
+addition        = multiplication , { ( "+" | "-" ) , multiplication } ;
+
+multiplication  = unaire , { ( "*" | "/" | "%" ) , unaire } ;
+
+unaire          = ( "-" | "+" ) , unaire
+                | puissance ;
+
+(* Associatif à droite ; l'exposant peut être un unaire : 2 ^ -1. *)
+puissance       = postfixe , [ "^" , unaire ] ;
+
+postfixe        = primaire , { appel | indice } ;
+appel           = "(" , [ arguments ] , ")" ;
+arguments       = expression , { "," , expression } ;
+indice          = "[" , expression , "]" ;
+
+primaire        = ENTIER
+                | DECIMAL
+                | TEXTE
+                | "vrai" | "faux" | "nul"
+                | IDENT
+                | "(" , expression , ")"
+                | liste ;
+
+(* Une virgule finale est permise : [1, 2, 3,] *)
+liste           = "[" , [ expression , { "," , expression } , [ "," ] ] , "]" ;

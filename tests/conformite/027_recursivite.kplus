@@ -1,0 +1,8 @@
+fonction factorielle(n)
+    si n <= 1 alors
+        retourner 1
+    fin
+    retourner n * factorielle(n - 1)
+fin
+afficher(factorielle(10))
+afficher(factorielle(25))

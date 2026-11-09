@@ -1,0 +1,5 @@
+afficher(absolu(-5), absolu(2.5))
+afficher(racine(16))
+afficher(arrondir(2.5), arrondir(-2.5), arrondir(2.4))
+afficher(arrondir(3.14159, 2))
+afficher(type(arrondir(2.5)))

@@ -1,0 +1,3 @@
+afficher("Ligne 1\nLigne 2")
+afficher("A\tB")
+afficher("Guillemet : \" et barre : \\")

@@ -1,0 +1,2 @@
+afficher("ne doit PAS s'afficher")
+variable x = 5 @ 2

@@ -1,0 +1,11 @@
+pour chaque fruit dans ["pomme", "kiwi"] faire
+    afficher(fruit)
+fin
+pour chaque lettre dans "abc" faire
+    afficher(lettre)
+fin
+variable l = [1, 2]
+pour chaque x dans l faire
+    ajouter(l, x)
+fin
+afficher(l)

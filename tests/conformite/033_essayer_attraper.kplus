@@ -1,0 +1,28 @@
+essayer
+    afficher("avant")
+    afficher(10 / 0)
+    afficher("jamais")
+attraper erreur
+    afficher("Problème : " + erreur)
+fin
+essayer
+    lever "montant négatif"
+attraper e
+    afficher(e)
+fin
+essayer
+    afficher("tout va bien")
+attraper
+    afficher("jamais")
+fin
+fonction verifier(x)
+    si x < 0 alors
+        lever "x doit être positif"
+    fin
+    retourner x
+fin
+essayer
+    verifier(-1)
+attraper message
+    afficher(message)
+fin

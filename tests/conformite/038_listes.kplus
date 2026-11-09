@@ -1,0 +1,15 @@
+variable notes = [12, 15, 9]
+afficher(notes[0], notes[2])
+notes[1] = 18
+afficher(notes)
+ajouter(notes, 20)
+afficher(longueur(notes))
+afficher(longueur("Manassé"))
+afficher("Bonjour"[3])
+variable grille = [[0, 0], [0, 0]]
+grille[1][0] = 7
+afficher(grille)
+variable copie = notes
+copie[0] = 0
+afficher(notes[0])
+afficher([])

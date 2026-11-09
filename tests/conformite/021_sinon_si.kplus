@@ -1,0 +1,12 @@
+fonction mention(note)
+    si note >= 16 alors
+        retourner "Très bien"
+    sinon si note >= 10 alors
+        retourner "Admis"
+    sinon
+        retourner "Ajourné"
+    fin
+fin
+afficher(mention(18))
+afficher(mention(12))
+afficher(mention(4))

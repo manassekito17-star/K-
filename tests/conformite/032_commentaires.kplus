@@ -1,0 +1,7 @@
+# Commentaire sur une ligne
+afficher("un") # commentaire en fin de ligne
+/* Commentaire
+   sur plusieurs
+   lignes */
+afficher("deux # pas un commentaire")
+afficher(/* au milieu */ "trois")

@@ -1,0 +1,3 @@
+variable l = [1, 2, 3]
+afficher(l[2])
+afficher(l[3])

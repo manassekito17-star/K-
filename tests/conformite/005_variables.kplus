@@ -1,0 +1,7 @@
+variable nom = "Manassé"
+variable âge = 20
+afficher(nom, âge)
+âge = âge + 1
+afficher(âge)
+variable Nom = "autre"
+afficher(nom, Nom)

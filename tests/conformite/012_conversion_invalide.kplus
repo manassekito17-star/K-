@@ -1,0 +1,2 @@
+afficher(entier("12"))
+afficher(entier("abc"))
