@@ -46,3 +46,5 @@ jobs:
           npx playwright install --with-deps chromium
       - name: Test de bout en bout dans le navigateur
         run: node studio/tests/e2e.mjs
+      - name: Test dans un sous-dossier (comme sur GitHub Pages)
+        run: node studio/tests/e2e.mjs --sous-chemin K-

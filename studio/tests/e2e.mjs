@@ -6,10 +6,14 @@
  * Nécessite Internet (Pyodide est téléchargé depuis cdn.jsdelivr.net).
  *
  * Utilisation (depuis la racine du projet) :
- *     node studio/tests/e2e.mjs [dossier-captures]
+ *     node studio/tests/e2e.mjs [dossier-captures] [--sous-chemin NOM]
+ *
+ * --sous-chemin sert le site dans un sous-dossier (http://…/NOM/), comme
+ * GitHub Pages (https://utilisateur.github.io/K-/).
  */
 import { spawn, execFileSync } from "node:child_process";
-import { readFileSync, mkdirSync } from "node:fs";
+import { readFileSync, mkdirSync, mkdtempSync, symlinkSync } from "node:fs";
+import os from "node:os";
 import { createRequire } from "node:module";
 import path from "node:path";
 import net from "node:net";
@@ -18,7 +22,10 @@ const require = createRequire(import.meta.url);
 const { chromium } = require("playwright");
 
 const RACINE = path.resolve(path.dirname(new URL(import.meta.url).pathname), "../..");
-const CAPTURES = process.argv[2] || null;
+const args = process.argv.slice(2);
+const iSous = args.indexOf("--sous-chemin");
+const SOUS_CHEMIN = iSous >= 0 ? args.splice(iSous, 2)[1] : "";
+const CAPTURES = args[0] || null;
 const resultats = [];
 
 function verifier(nom, condition, detail = "") {
@@ -35,8 +42,13 @@ function portLibre() {
 
 execFileSync("python3", ["studio/construire.py"], { cwd: RACINE, stdio: "inherit" });
 const port = await portLibre();
+let dossierServi = path.join(RACINE, "studio/dist");
+if (SOUS_CHEMIN) {
+  dossierServi = mkdtempSync(path.join(os.tmpdir(), "kplus-studio-"));
+  symlinkSync(path.join(RACINE, "studio/dist"), path.join(dossierServi, SOUS_CHEMIN));
+}
 const serveur = spawn("python3", ["-m", "http.server", String(port), "--bind", "127.0.0.1",
-                                  "--directory", "studio/dist"], { cwd: RACINE, stdio: "ignore" });
+                                  "--directory", dossierServi], { cwd: RACINE, stdio: "ignore" });
 await new Promise((r) => setTimeout(r, 800));
 
 const options = {};
@@ -67,7 +79,9 @@ async function executer(source, entree = "") {
 
 try {
   const debut = Date.now();
-  await page.goto(`http://127.0.0.1:${port}/`);
+  const adresse = `http://127.0.0.1:${port}/${SOUS_CHEMIN ? SOUS_CHEMIN + "/" : ""}`;
+  console.log(`       (adresse testée : ${adresse})`);
+  await page.goto(adresse);
   await attendreMoteur();
   verifier("le moteur K+ se charge dans le navigateur", true,
            `${Math.round((Date.now() - debut) / 1000)} s`);

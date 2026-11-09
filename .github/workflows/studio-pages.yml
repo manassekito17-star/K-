@@ -1,0 +1,60 @@
+name: Publication de K+ Studio
+
+# Met K+ Studio en ligne sur GitHub Pages à chaque envoi sur la branche
+# principale, uniquement si tous les tests réussissent.
+# Activation (une seule fois) : Settings → Pages → Source : « GitHub Actions ».
+# Tant que Pages n'est pas activé, rien n'est publié et le travail reste vert.
+
+on:
+  push:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  construire:
+    if: github.ref_name == github.event.repository.default_branch
+    runs-on: ubuntu-latest
+    outputs:
+      pages_active: ${{ steps.pages.outcome == 'success' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Tests (rien n'est publié si un test échoue)
+        run: python -m unittest
+      - name: Construction de K+ Studio
+        run: python studio/construire.py
+      - name: GitHub Pages est-il activé ?
+        id: pages
+        continue-on-error: true
+        uses: actions/configure-pages@v5
+      - name: Pages pas encore activé
+        if: steps.pages.outcome != 'success'
+        run: |
+          echo "::notice title=K+ Studio non publié::GitHub Pages n'est pas encore activé. Settings → Pages → Source : GitHub Actions, puis relancez ce travail."
+      - name: Préparation des fichiers du site
+        if: steps.pages.outcome == 'success'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: studio/dist
+
+  publier:
+    needs: construire
+    if: needs.construire.outputs.pages_active == 'true'
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploiement.outputs.page_url }}
+    steps:
+      - name: Mise en ligne
+        id: deploiement
+        uses: actions/deploy-pages@v4

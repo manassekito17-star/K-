@@ -63,6 +63,9 @@ python studio/construire.py --servir
 
 Voir [studio/README.md](studio/README.md).
 
+En ligne, sans installation : **https://manassekito17-star.github.io/K-/**
+(disponible après l'activation décrite dans [docs/PUBLICATION.md](docs/PUBLICATION.md)).
+
 ## Tests
 
 ```

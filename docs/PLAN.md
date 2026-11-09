@@ -6,7 +6,7 @@
 | 2 | Développement du moteur (interpréteur Python) | **Terminée** |
 | 3 | Tests et validation de K+ 0.1 | **Terminée** |
 | 4 | K+ Studio (éditeur web) | **Terminée** |
-| 5 | Évolution multiplateforme (paquets, compilateur natif) | À faire |
+| 5 | Évolution multiplateforme (paquets, compilateur natif) | **En cours** |
 | 6 | Bibliothèques avancées et intelligence artificielle | À faire |
 
 ---
@@ -105,7 +105,11 @@ langage) : `pile.py` reconnaît Pyodide, et l'affichage et la comparaison des
 listes utilisent des boucles simples (une liste imbriquée 5000 fois faisait
 planter Pyodide).
 
-## Phase 5 — Évolution multiplateforme (à venir)
+## Phase 5 — Évolution multiplateforme (en cours)
 
-Pistes : mise en ligne de K+ Studio (GitHub Pages), paquet installable
-(PyPI), première étape vers un compilateur.
+- Mise en ligne de K+ Studio sur GitHub Pages : procédure automatique en
+  place (`.github/workflows/studio-pages.yml`), testée dans un sous-dossier
+  comme sur Pages. **Reste à faire par le responsable : activer Pages**
+  ([guide](PUBLICATION.md)).
+- Pistes suivantes : paquet installable (PyPI), première étape vers un
+  compilateur.
