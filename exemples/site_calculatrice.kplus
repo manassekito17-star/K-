@@ -1,0 +1,21 @@
+# Site dynamique : calculatrice (K+ Web)
+
+utiliser web
+
+titre_page("Calculatrice")
+titre("Calculatrice du double")
+variable saisie = champ("Votre nombre")
+variable resultat = paragraphe("")
+
+fonction calculer()
+    essayer
+        variable n = decimal(valeur(saisie))
+        changer_texte(resultat, "Le double est " + texte(n * 2))
+        couleur(resultat, "vert")
+    attraper
+        changer_texte(resultat, "Écrivez un nombre, par exemple 3.5")
+        couleur(resultat, "rouge")
+    fin
+fin
+
+bouton("Calculer", calculer)

@@ -34,6 +34,9 @@ TITRES_EXEMPLES = {
     "textes": "Manipulation de textes",
     "banque": "Compte bancaire",
     "grands_nombres": "Grands nombres",
+    "site_calculatrice": "Site web : calculatrice",
+    "site_taches": "Site web : liste de tâches",
+    "site_chronometre": "Site web : chronomètre",
 }
 
 
@@ -69,6 +72,8 @@ def construire(dist: Path = DIST) -> dict:
     (dist / "manifeste.json").write_text(
         json.dumps(manifeste, ensure_ascii=False, indent=2), encoding="utf-8")
 
+    # Affichage des pages K+ Web : le même fichier que pour « kplus --site ».
+    shutil.copy2(RACINE / "kplus" / "rendu_web.js", dist / "rendu_web.js")
     shutil.copytree(STUDIO / "icones", dist / "icones")
     ecrire_service_worker(dist)
     return manifeste

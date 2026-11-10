@@ -1,0 +1,29 @@
+# Site dynamique : liste de tâches (K+ Web)
+# Cliquez sur une tâche pour la supprimer.
+
+utiliser web
+
+titre("Mes tâches")
+variable nouvelle = champ("Nouvelle tâche")
+variable taches = liste()
+variable compteur = paragraphe("0 tâche")
+variable nombre = 0
+
+fonction ajouter_tache()
+    si valeur(nouvelle) == "" alors
+        retourner
+    fin
+    variable ligne = ajouter_ligne(taches, valeur(nouvelle))
+    quand_clic(ligne, terminer)
+    changer_valeur(nouvelle, "")
+    nombre = nombre + 1
+    changer_texte(compteur, texte(nombre) + " tâche(s)")
+fin
+
+fonction terminer(ligne)
+    supprimer(ligne)
+    nombre = nombre - 1
+    changer_texte(compteur, texte(nombre) + " tâche(s)")
+fin
+
+bouton("Ajouter", ajouter_tache)

@@ -59,6 +59,17 @@ function traiter(message) {
       resultat = { statut: "interne", message: String(erreur && erreur.message || erreur) };
     }
     postMessage({ type: "fin", resultat });
+  } else if (message.type === "evenement") {
+    // Clic, saisie ou minuterie sur une page K+ Web.
+    const envoyer = (genre, texte) => postMessage({ type: "flux", genre, texte });
+    let resultat;
+    try {
+      resultat = JSON.parse(pont.evenement(message.id, message.genre,
+                                           JSON.stringify(message.valeurs || {}), envoyer));
+    } catch (erreur) {
+      resultat = { statut: "interne", commandes: [], texte_erreur: String(erreur && erreur.message || erreur) };
+    }
+    postMessage({ type: "evenement_fin", requete: message.requete, resultat });
   }
 }
 

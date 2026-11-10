@@ -58,10 +58,19 @@
 
     <section class="panneau panneau-console" aria-label="Résultats">
       <div class="entete-panneau">
-        <span>Console</span>
+        <div class="onglets" role="tablist" aria-label="Résultats">
+          <button id="onglet-console" class="onglet actif" type="button" role="tab"
+                  aria-selected="true" aria-controls="console">Console</button>
+          <button id="onglet-page" class="onglet" type="button" role="tab"
+                  aria-selected="false" aria-controls="cadre-page" hidden>Page</button>
+        </div>
+        <span id="titre-page-web" class="titre-page-web"></span>
         <button id="bouton-effacer" class="discret" type="button">Effacer</button>
       </div>
       <pre id="console" class="console" aria-live="polite"></pre>
+      <div id="cadre-page" class="cadre-page" role="tabpanel" aria-label="Page web" hidden>
+        <div id="page-web"></div>
+      </div>
       <details class="entrees" id="bloc-entrees">
         <summary>Entrée clavier pour <code>demander()</code></summary>
         <p class="aide">Une réponse par ligne, utilisées dans l'ordre. Quand il n'y a
@@ -89,6 +98,7 @@
   </footer>
 
   <script src="coloration.js"></script>
+  <script src="rendu_web.js"></script>
   <script src="studio.js"></script>
 </body>
 </html>

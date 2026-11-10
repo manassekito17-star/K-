@@ -246,6 +246,16 @@ button.discret { border: none; background: none; color: var(--texte-doux); paddi
 .etat .pret::before { content: "● "; color: var(--succes); }
 .etat .echec { color: var(--danger); }
 
+/* --- Onglets Console / Page (K+ Web) --- */
+
+.onglets { display: flex; gap: 2px; }
+.onglet { border: none; background: none; color: var(--texte-doux); padding: 2px 10px; border-radius: 4px; }
+.onglet.actif { background: var(--surface); color: var(--texte); font-weight: 600; box-shadow: 0 0 0 1px var(--bord); }
+.titre-page-web { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--texte-doux); }
+.cadre-page { flex: 1; min-height: 120px; overflow: auto; background: #ffffff; }
+.cadre-page[hidden] { display: none; }
+.console[hidden] { display: none; }
+
 /* --- Installation, hors ligne, mise à jour --- */
 
 button.installer { border-color: var(--accent); color: var(--accent); font-weight: 600; }

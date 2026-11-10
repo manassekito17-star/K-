@@ -1,0 +1,40 @@
+# Site dynamique : chronomètre (K+ Web, minuterie)
+
+utiliser web
+
+titre_page("Chronomètre")
+titre("Chronomètre")
+variable affichage = paragraphe("0.0 s")
+variable dixiemes = 0
+variable minuterie = nul
+
+fonction tic()
+    dixiemes = dixiemes + 1
+    changer_texte(affichage, texte(entier(dixiemes / 10)) + "." + texte(dixiemes % 10) + " s")
+fin
+
+fonction demarrer()
+    si minuterie == nul alors
+        minuterie = toutes_les(100, tic)
+        couleur(affichage, "vert")
+    fin
+fin
+
+fonction pause()
+    si minuterie != nul alors
+        arreter_minuterie(minuterie)
+        minuterie = nul
+        couleur(affichage, "orange")
+    fin
+fin
+
+fonction remettre_a_zero()
+    pause()
+    dixiemes = 0
+    changer_texte(affichage, "0.0 s")
+    couleur(affichage, "noir")
+fin
+
+bouton("Démarrer", demarrer)
+bouton("Pause", pause)
+bouton("Remettre à zéro", remettre_a_zero)

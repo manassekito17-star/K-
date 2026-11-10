@@ -54,6 +54,9 @@
   let travailleur = null;
   let pret = false;
   let enCours = false;
+  let pageActive = false;              // page K+ Web vivante (clics, minuteries)
+  let prochaineRequete = 1;
+  const evenementsEnAttente = new Map(); // requête -> fonction de fin
   let ligneErreur = null;
   let numeroVerification = 0;
   let minuteurVerification = null;
@@ -286,7 +289,71 @@
 
   function mettreAJourBoutons() {
     boutonExecuter.disabled = !pret || enCours;
-    boutonArreter.disabled = !enCours;
+    boutonArreter.disabled = !enCours && !pageActive;
+  }
+
+  // --- Page K+ Web (« utiliser web ») -----------------------------------------------
+
+  const ongletConsole = $("onglet-console");
+  const ongletPage = $("onglet-page");
+  const cadrePage = $("cadre-page");
+  const titrePageWeb = $("titre-page-web");
+  const rendu = KPlusRendu.creerRendu($("page-web"), {
+    surEvenement: envoyerEvenement,
+    surTitre: (t) => { titrePageWeb.textContent = t; },
+  });
+
+  function montrerOnglet(nom) {
+    const page = nom === "page";
+    consoleSortie.hidden = page;
+    cadrePage.hidden = !page;
+    ongletConsole.classList.toggle("actif", !page);
+    ongletPage.classList.toggle("actif", page);
+    ongletConsole.setAttribute("aria-selected", String(!page));
+    ongletPage.setAttribute("aria-selected", String(page));
+  }
+  ongletConsole.addEventListener("click", () => montrerOnglet("console"));
+  ongletPage.addEventListener("click", () => montrerOnglet("page"));
+
+  function envoyerEvenement(id, genre, valeurs) {
+    if (!pageActive || !pret) return undefined;
+    return new Promise((fin) => {
+      const requete = prochaineRequete++;
+      evenementsEnAttente.set(requete, fin);
+      travailleur.postMessage({ type: "evenement", id, genre, valeurs, requete });
+    });
+  }
+
+  function terminerEvenement(message) {
+    const fin = evenementsEnAttente.get(message.requete);
+    evenementsEnAttente.delete(message.requete);
+    const r = message.resultat;
+    if (pageActive) rendu.appliquer(r.commandes || []);
+    if (r.texte_erreur) {
+      const debut = consoleSortie.textContent;
+      if (debut && !debut.endsWith("\n")) ajouterConsole("\n", "sortie");
+      ajouterConsole(r.texte_erreur + "\n", "erreur");
+    }
+    if (fin) fin();
+  }
+
+  function abandonnerEvenements() {
+    for (const fin of evenementsEnAttente.values()) fin();
+    evenementsEnAttente.clear();
+  }
+
+  function fermerPage() {
+    rendu.arreterMinuteries();
+    pageActive = false;
+    mettreAJourBoutons();
+  }
+
+  function nouvellePage() {
+    fermerPage();
+    rendu.vider();
+    titrePageWeb.textContent = "";
+    ongletPage.hidden = true;
+    montrerOnglet("console");
   }
 
   function demarrerMoteur() {
@@ -321,12 +388,23 @@
       case "fin":
         terminerExecution(message.resultat);
         break;
+      case "evenement_fin":
+        terminerEvenement(message);
+        break;
     }
   }
 
   function executer() {
     if (!pret || enCours) return;
+    if (evenementsEnAttente.size) {          // une action web tourne encore : on repart à zéro
+      travailleur.terminate();
+      abandonnerEvenements();
+      nouvellePage();
+      demarrerMoteur();
+      return;
+    }
     viderConsole();
+    nouvellePage();
     enCours = true;
     ligneErreur = null;
     rendre();
@@ -349,14 +427,33 @@
       ajouterLigneSysteme(`Programme terminé (${resultat.duree_ms} ms).`);
     }
     changerEtat("Moteur K+ prêt", "pret");
+    if (resultat.web) {
+      pageActive = true;
+      ongletPage.hidden = false;
+      rendu.appliquer(resultat.commandes || []);
+      montrerOnglet("page");
+      ajouterLigneSysteme("Page web créée : elle est affichée dans l'onglet Page. " +
+                          "« Arrêter » la fige (minuteries comprises).");
+      changerEtat("Page web active", "pret");
+      mettreAJourBoutons();
+    }
   }
 
   function arreter() {
-    if (!enCours) return;
-    travailleur.terminate();
-    enCours = false;
-    ajouterLigneSysteme("Programme arrêté par l'utilisateur.");
-    demarrerMoteur();
+    if (!enCours && !pageActive) return;
+    const occupe = enCours || evenementsEnAttente.size > 0;
+    fermerPage();
+    if (occupe) {
+      // Le moteur calcule encore (boucle infinie…) : on le redémarre.
+      travailleur.terminate();
+      abandonnerEvenements();
+      enCours = false;
+      ajouterLigneSysteme("Programme arrêté par l'utilisateur.");
+      demarrerMoteur();
+    } else {
+      ajouterLigneSysteme("Page web arrêtée : elle ne réagit plus aux clics.");
+      changerEtat("Moteur K+ prêt", "pret");
+    }
   }
 
   // --- Fichiers et exemples ------------------------------------------------------------

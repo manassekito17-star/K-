@@ -15,7 +15,9 @@ ATTENDUS = RACINE / "tests" / "exemples"
 
 # Cas : (programme, fichier d'entrée clavier ou None, fichier de sortie attendue)
 CAS = [(p.stem, None, p.stem) for p in sorted((RACINE / "exemples").glob("*.kplus"))
-       if p.stem != "devinette"]
+       if p.stem != "devinette" and not p.stem.startswith("site_")]
+# Les sites (« utiliser web ») se testent dans tests/test_web.py et dans K+ Studio.
+SITES = sorted(p.stem for p in (RACINE / "exemples").glob("site_*.kplus"))
 CAS += [("devinette", "devinette", "devinette"),
         ("devinette", "devinette_perdu", "devinette_perdu")]
 
@@ -37,6 +39,20 @@ class TestExemples(unittest.TestCase):
                 self.assertEqual(r.stderr, "")
                 self.assertEqual(r.returncode, 0)
                 self.assertEqual(r.stdout, attendu)
+
+
+class TestSitesEnLigneDeCommande(unittest.TestCase):
+    def test_message_explicatif(self):
+        self.assertGreaterEqual(len(SITES), 3)
+        for site in SITES:
+            with self.subTest(site=site):
+                r = subprocess.run(
+                    [sys.executable, "-m", "kplus", f"exemples/{site}.kplus"],
+                    cwd=RACINE, capture_output=True, text=True, encoding="utf-8", timeout=60,
+                    env=dict(os.environ, PYTHONIOENCODING="utf-8"))
+                self.assertEqual((r.returncode, r.stdout), (0, ""))
+                self.assertIn("crée une page web", r.stderr)
+                self.assertIn("kplus --site", r.stderr)
 
 
 if __name__ == "__main__":

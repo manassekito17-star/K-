@@ -112,7 +112,8 @@ try {
   const manifeste = URL_EN_LIGNE
     ? await page.evaluate(async () => (await fetch("manifeste.json")).json())
     : JSON.parse(readFileSync(path.join(RACINE, "studio/dist/manifeste.json"), "utf8"));
-  for (const exemple of manifeste.exemples) {
+  // Les sites (« utiliser web ») sont testés plus bas, dans l'onglet Page.
+  for (const exemple of manifeste.exemples.filter((x) => !x.nom.startsWith("site_"))) {
     await page.selectOption("#choix-exemple", exemple.nom);
     await page.waitForFunction((n) => document.getElementById("nom-fichier").textContent === n + ".kplus",
                                 exemple.nom);
@@ -197,6 +198,87 @@ try {
   // 8. Grosse sortie : la page reste utilisable.
   sortie = await executer('pour i de 1 à 20000 faire\n    afficher("ligne", i)\nfin\n');
   verifier("20 000 lignes affichées", sortie.includes("ligne 20000\n"), sortie.slice(-200));
+
+  // K+ Web : onglet Page, clics, saisie, minuteries, erreurs, sécurité.
+  let alerteOuverte = false;
+  page.on("dialog", (d) => { if (d.type() === "alert") alerteOuverte = true; });
+  const cadre = page.locator("#page-web");
+  async function lancerSite(nomOuSource) {
+    if (nomOuSource.startsWith("site_")) {
+      await page.selectOption("#choix-exemple", nomOuSource);
+      await page.waitForFunction((n) => document.getElementById("nom-fichier").textContent === n + ".kplus", nomOuSource);
+    } else {
+      await page.fill("#code", nomOuSource);
+    }
+    await page.click("#bouton-executer");
+    await page.waitForFunction(() => !document.getElementById("cadre-page").hidden, null, { timeout: 60000 });
+  }
+
+  await lancerSite("site_taches");
+  verifier("programme web : l'onglet Page s'ouvre avec la page", (await cadre.locator("h1").innerText()) === "Mes tâches");
+  await cadre.locator("input").fill("Réviser K+");
+  await cadre.getByRole("button", { name: "Ajouter" }).click();
+  // Attendre la réponse du moteur (qui vide le champ) avant de taper la suite.
+  await page.waitForFunction(() => document.querySelectorAll("#page-web li").length === 1);
+  await cadre.locator("input").fill("Faire du sport");
+  await cadre.getByRole("button", { name: "Ajouter" }).click();
+  await page.waitForFunction(() => document.querySelectorAll("#page-web li").length === 2);
+  verifier("clic sur un bouton : tâches ajoutées, compteur, champ vidé",
+           (await cadre.locator("p").innerText()) === "2 tâche(s)" && (await cadre.locator("input").inputValue()) === "");
+  await cadre.locator("li", { hasText: "Réviser K+" }).click();
+  await page.waitForFunction(() => document.querySelectorAll("#page-web li").length === 1);
+  verifier("clic sur une ligne : la tâche disparaît", (await cadre.locator("p").innerText()) === "1 tâche(s)");
+
+  await lancerSite("site_calculatrice");
+  verifier("titre de la page affiché", (await page.locator("#titre-page-web").innerText()) === "Calculatrice");
+  await cadre.locator("input").fill("21");
+  await cadre.getByRole("button", { name: "Calculer" }).click();
+  await page.waitForFunction(() => document.querySelector("#page-web p").textContent === "Le double est 42.0");
+  const couleurVerte = await cadre.locator("p").evaluate((e) => getComputedStyle(e).color);
+  verifier("calculatrice : résultat et couleur", couleurVerte === "rgb(42, 157, 75)", couleurVerte);
+
+  await lancerSite("site_chronometre");
+  await cadre.getByRole("button", { name: "Démarrer" }).click();
+  await page.waitForFunction(() => document.querySelector("#page-web p").textContent !== "0.0 s", null, { timeout: 5000 });
+  await page.waitForTimeout(600);
+  verifier("minuterie : le chronomètre avance", (await cadre.locator("p").innerText()) !== "0.0 s");
+  await page.click("#bouton-arreter");
+  const fige = await cadre.locator("p").innerText();
+  await page.waitForTimeout(800);
+  verifier("Arrêter fige la page (minuterie arrêtée)",
+           (await cadre.locator("p").innerText()) === fige && (await texteConsole()).includes("Page web arrêtée"),
+           fige);
+
+  await lancerSite('utiliser web\nparagraphe("<img src=x onerror=alert(1)><b>gras</b>")\n' +
+                   'fonction f()\n    afficher(10 / 0)\nfin\nbouton("Panne", f)\n');
+  verifier("un texte contenant du HTML reste du texte",
+           (await cadre.locator("img, b").count()) === 0 &&
+           (await cadre.locator("p").innerText()).includes("<b>gras</b>") && !alerteOuverte);
+  await cadre.getByRole("button", { name: "Panne" }).click();
+  await page.waitForFunction(() => document.querySelector("#page-web .kp-erreur"), null, { timeout: 10000 });
+  verifier("erreur dans une action : bandeau avec la ligne",
+           (await cadre.locator(".kp-erreur").innerText()).includes("Erreur de division par zéro (ligne 4"));
+  verifier("la page reste utilisable après l'erreur", await cadre.getByRole("button", { name: "Panne" }).isEnabled());
+
+  await lancerSite('utiliser web\nfonction boucle()\n    tant que vrai faire\n    fin\nfin\nbouton("Bloquer", boucle)\n');
+  await cadre.getByRole("button", { name: "Bloquer" }).click();
+  await page.waitForTimeout(800);
+  await page.click("#bouton-arreter");
+  await attendreMoteur();
+  sortie = await executer('afficher("reparti")\n');
+  verifier("boucle infinie dans un clic : Arrêter relance le moteur", sortie.startsWith("reparti\n"), sortie);
+  if (CAPTURES) {
+    await lancerSite("site_taches");
+    let n = 0;
+    for (const t of ["Réviser le cours K+", "Créer mon premier site", "Publier le site"]) {
+      await cadre.locator("input").fill(t);
+      await cadre.getByRole("button", { name: "Ajouter" }).click();
+      n += 1;
+      await page.waitForFunction((k) => document.querySelectorAll("#page-web li").length === k, n);
+    }
+    await page.waitForFunction(() => document.querySelectorAll("#page-web li").length === 3);
+    await page.screenshot({ path: path.join(CAPTURES, "studio-page-web.png") });
+  }
 
   // 9. Application installable et utilisable sans Internet.
   const cdp = await page.context().newCDPSession(page);

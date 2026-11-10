@@ -211,6 +211,28 @@ class TestEvenements(unittest.TestCase):
         self.assertIsNone(web.declencher(interp, "e1", "clic", {}))
 
 
+class TestExemplesDeSites(unittest.TestCase):
+    def test_chronometre(self):
+        source = (Path(RACINE) / "exemples" / "site_chronometre.kplus").read_text(encoding="utf-8")
+        interp, _ = lancer(source)
+        interp.page.prendre_commandes()
+        boutons = {e.texte: e.id for e in elements(interp, "bouton")}
+        affichage = elements(interp, "paragraphe")[0]
+        web.declencher(interp, boutons["Démarrer"], "clic", {})
+        web.declencher(interp, boutons["Démarrer"], "clic", {})        # pas de 2e minuterie
+        self.assertEqual(len(elements(interp, "minuterie")), 1)
+        m = elements(interp, "minuterie")[0].id
+        for _ in range(15):
+            web.declencher(interp, m, "minuterie", {})
+        self.assertEqual(affichage.texte, "1.5 s")
+        web.declencher(interp, boutons["Pause"], "clic", {})
+        self.assertEqual(elements(interp, "minuterie"), [])
+        web.declencher(interp, m, "minuterie", {})                     # arrêtée : sans effet
+        self.assertEqual(affichage.texte, "1.5 s")
+        web.declencher(interp, boutons["Remettre à zéro"], "clic", {})
+        self.assertEqual(affichage.texte, "0.0 s")
+
+
 class TestPont(unittest.TestCase):
     """Session web de K+ Studio : démarrage puis événements."""
 
