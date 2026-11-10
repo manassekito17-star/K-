@@ -14,6 +14,28 @@ sinon
 fin
 ```
 
+## Créer des sites web dynamiques (K+ 0.2)
+
+```kplus
+utiliser web
+
+titre("Calculatrice du double")
+variable saisie = champ("Votre nombre")
+variable resultat = paragraphe("")
+
+fonction calculer()
+    changer_texte(resultat, "Le double est " + texte(decimal(valeur(saisie)) * 2))
+fin
+
+bouton("Calculer", calculer)
+```
+
+- Dans **K+ Studio**, le site s'affiche dans l'onglet **Page**.
+- `kplus --site programme.kplus` crée un **vrai site publiable** (GitHub Pages,
+  Netlify…).
+- Guide complet : [spécification K+ Web](docs/specification/kplus-web-0.2.md) ;
+  exemples : `exemples/site_*.kplus`.
+
 ## État du projet
 
 **K+ 0.1 fonctionne et est validé** sur Windows, macOS et Linux :
@@ -47,6 +69,7 @@ pip install .
 ```
 kplus exemples/bonjour.kplus            # exécuter un programme
 kplus --verifier exemples/bonjour.kplus # vérifier sans exécuter
+kplus --site exemples/site_taches.kplus  # créer un site web publiable
 kplus                                   # mode interactif
 kplus --aide
 ```
@@ -98,4 +121,5 @@ compte bancaire, grands nombres.
 - [Architecture du moteur](docs/ARCHITECTURE.md)
 - [Rapport de validation K+ 0.1](docs/VALIDATION-0.1.md)
 - [Plan de travail](docs/PLAN.md)
-- [Feuille de route des versions (proposition)](docs/FEUILLE-DE-ROUTE.md)
+- [K+ Web : créer des sites (K+ 0.2)](docs/specification/kplus-web-0.2.md)
+- [Feuille de route des versions](docs/FEUILLE-DE-ROUTE.md)

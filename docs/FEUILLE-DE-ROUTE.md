@@ -1,7 +1,7 @@
-# Feuille de route de K+ — proposition
+# Feuille de route de K+
 
-> **Statut : proposition, en attente de validation.** Seule la version 0.1
-> existe et fonctionne. Tout ce qui suit est à faire.
+> **Statut : validée par le responsable du projet.** Les versions 0.1 et 0.2
+> existent et fonctionnent ; les suivantes sont à faire.
 
 **Objectif :** que K+ permette de faire ce que permettent PHP, Python,
 JavaScript, HTML, CSS, C, C++, C# et Java. Il ne s'agit pas de copier leurs
@@ -15,7 +15,7 @@ lorsqu'elle fonctionne et qu'elle est testée.
 | Version | Capacité | Inspirée de | Exemple en K+ |
 |---|---|---|---|
 | **0.1** ✓ | Bases : variables, conditions, boucles, fonctions, listes, erreurs | Python, pseudocode | `si age >= 18 alors … fin` |
-| **0.2** | **Sites dynamiques dans le navigateur** : pages, boutons, champs, événements, minuteries, export d'un site publiable | JavaScript, HTML, CSS | `bouton("Calculer", calculer)` |
+| **0.2** ✓ | **Sites dynamiques dans le navigateur** : pages, boutons, champs, événements, minuteries, export d'un site publiable | JavaScript, HTML, CSS | `bouton("Calculer", calculer)` |
 | **0.3** | **Sites côté serveur** : pages générées par le serveur, formulaires, adresses (`/contact`), base de données, sessions, commande `kplus --serveur` | PHP, Python (Flask, Django) | `page "/bonjour" faire … fin` |
 | **0.4** | **Données et organisation** : dictionnaires, textes avec `{variables}`, textes sur plusieurs lignes, modules (`utiliser`), mise en forme de la page façon CSS (`style`) | Python, JavaScript, PHP, CSS | `variable eleve = {"nom": "Awa", "note": 15}` |
 | **0.5** | **Programmation objet** : classes, objets, méthodes, héritage | Java, C#, C++, Python | `classe Compte … fin` |

@@ -14,8 +14,8 @@ from .parser import analyser_syntaxe
 from .pile import avec_grande_pile
 from .verificateur import verifier
 
-__version__ = "0.1.0"
-VERSION_LANGAGE = "0.1"
+__version__ = "0.2.0"
+VERSION_LANGAGE = "0.2"
 
 
 def analyser(source: str, interactif: bool = False) -> Programme:

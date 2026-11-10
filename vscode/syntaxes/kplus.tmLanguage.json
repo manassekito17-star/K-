@@ -2,17 +2,40 @@
   "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
   "name": "K+",
   "scopeName": "source.kplus",
-  "fileTypes": ["kplus"],
+  "fileTypes": [
+    "kplus"
+  ],
   "patterns": [
-    { "include": "#commentaires" },
-    { "include": "#textes" },
-    { "include": "#nombres" },
-    { "include": "#definition-fonction" },
-    { "include": "#mots-cles" },
-    { "include": "#natives" },
-    { "include": "#appel" },
-    { "include": "#operateurs" },
-    { "include": "#inconnu" }
+    {
+      "include": "#commentaires"
+    },
+    {
+      "include": "#textes"
+    },
+    {
+      "include": "#nombres"
+    },
+    {
+      "include": "#definition-fonction"
+    },
+    {
+      "include": "#mots-cles"
+    },
+    {
+      "include": "#natives"
+    },
+    {
+      "include": "#natives-web"
+    },
+    {
+      "include": "#appel"
+    },
+    {
+      "include": "#operateurs"
+    },
+    {
+      "include": "#inconnu"
+    }
   ],
   "repository": {
     "commentaires": {
@@ -21,14 +44,26 @@
           "name": "comment.block.kplus",
           "begin": "/\\*",
           "end": "\\*/",
-          "beginCaptures": { "0": { "name": "punctuation.definition.comment.begin.kplus" } },
-          "endCaptures": { "0": { "name": "punctuation.definition.comment.end.kplus" } }
+          "beginCaptures": {
+            "0": {
+              "name": "punctuation.definition.comment.begin.kplus"
+            }
+          },
+          "endCaptures": {
+            "0": {
+              "name": "punctuation.definition.comment.end.kplus"
+            }
+          }
         },
         {
           "name": "comment.line.number-sign.kplus",
           "begin": "#",
           "end": "$",
-          "beginCaptures": { "0": { "name": "punctuation.definition.comment.kplus" } }
+          "beginCaptures": {
+            "0": {
+              "name": "punctuation.definition.comment.kplus"
+            }
+          }
         }
       ]
     },
@@ -38,20 +73,34 @@
           "name": "string.quoted.double.kplus",
           "begin": "\"",
           "end": "\"|$",
-          "patterns": [{ "include": "#echappements" }]
+          "patterns": [
+            {
+              "include": "#echappements"
+            }
+          ]
         },
         {
           "name": "string.quoted.other.typographic.kplus",
           "begin": "“",
           "end": "”|$",
-          "patterns": [{ "include": "#echappements" }]
+          "patterns": [
+            {
+              "include": "#echappements"
+            }
+          ]
         }
       ]
     },
     "echappements": {
       "patterns": [
-        { "name": "constant.character.escape.kplus", "match": "\\\\[nt\"\\\\]" },
-        { "name": "invalid.illegal.escape.kplus", "match": "\\\\." }
+        {
+          "name": "constant.character.escape.kplus",
+          "match": "\\\\[nt\"\\\\]"
+        },
+        {
+          "name": "invalid.illegal.escape.kplus",
+          "match": "\\\\."
+        }
       ]
     },
     "nombres": {
@@ -69,8 +118,12 @@
     "definition-fonction": {
       "match": "(?<![\\p{L}\\p{N}_])(fonction)\\s+([\\p{L}_][\\p{L}\\p{M}\\p{N}_]*)",
       "captures": {
-        "1": { "name": "storage.type.function.kplus" },
-        "2": { "name": "entity.name.function.kplus" }
+        "1": {
+          "name": "storage.type.function.kplus"
+        },
+        "2": {
+          "name": "entity.name.function.kplus"
+        }
       }
     },
     "mots-cles": {
@@ -99,19 +152,39 @@
     },
     "appel": {
       "match": "([\\p{L}_][\\p{L}\\p{M}\\p{N}_]*)\\s*(?=\\()",
-      "captures": { "1": { "name": "entity.name.function.call.kplus" } }
+      "captures": {
+        "1": {
+          "name": "entity.name.function.call.kplus"
+        }
+      }
     },
     "operateurs": {
       "patterns": [
-        { "name": "keyword.operator.comparison.kplus", "match": "==|!=|<=|>=|<|>" },
-        { "name": "keyword.operator.assignment.kplus", "match": "=" },
-        { "name": "keyword.operator.arithmetic.kplus", "match": "[-+*/%^]" },
-        { "name": "punctuation.separator.comma.kplus", "match": "," }
+        {
+          "name": "keyword.operator.comparison.kplus",
+          "match": "==|!=|<=|>=|<|>"
+        },
+        {
+          "name": "keyword.operator.assignment.kplus",
+          "match": "="
+        },
+        {
+          "name": "keyword.operator.arithmetic.kplus",
+          "match": "[-+*/%^]"
+        },
+        {
+          "name": "punctuation.separator.comma.kplus",
+          "match": ","
+        }
       ]
     },
     "inconnu": {
       "name": "invalid.illegal.character.kplus",
       "match": "[;@$&|{}'`~?!\\\\]"
+    },
+    "natives-web": {
+      "name": "support.function.web.kplus",
+      "match": "(?<![\\p{L}\\p{M}\\p{N}_])(ajouter_ligne|arreter_minuterie|bouton|cacher|champ|changer_texte|changer_valeur|couleur|couleur_fond|image|lien|liste|montrer|paragraphe|placer|quand_change|quand_clic|sous_titre|supprimer|texte_de|titre|titre_page|toutes_les|valeur|vider|zone)(?![\\p{L}\\p{M}\\p{N}_])(?=\\s*\\()"
     }
   }
 }

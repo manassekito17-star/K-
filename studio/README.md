@@ -67,7 +67,8 @@ navigateur garde ces fichiers en cache.
 | Erreurs | affichées dans la console, ligne surlignée en rouge, lien « Aller à la ligne » |
 | Réponses pour `demander()` | panneau **Entrée clavier**, une réponse par ligne |
 | Ouvrir / Enregistrer | fichiers `.kplus` de l'ordinateur (**Ctrl+S** pour enregistrer) |
-| Exemples | menu **Exemples…** |
+| Exemples | menu **Exemples…** (dont trois sites web : calculatrice, liste de tâches, chronomètre) |
+| Sites web (K+ Web) | un programme qui commence par `utiliser web` s'affiche dans l'onglet **Page** ; clics, saisies et minuteries sont transmis au programme ; **Arrêter** fige la page |
 | Sauvegarde automatique | le programme en cours est conservé dans le navigateur |
 | Indentation | **Tab** ajoute 4 espaces, **Maj+Tab** les retire ; retrait automatique après `alors`, `faire`... ; **Échap** puis **Tab** pour quitter l'éditeur au clavier |
 
@@ -99,7 +100,8 @@ navigateur garde ces fichiers en cache.
 |---|---|
 | Pont, construction, cohérence de la coloration avec le moteur | `python -m unittest tests.test_studio` |
 | Coloration | `node --test studio/tests/coloration.test.mjs` |
-| De bout en bout dans Chromium (33 vérifications, dont installation et hors ligne) | `node studio/tests/e2e.mjs` |
+| De bout en bout dans Chromium (45 vérifications, dont installation, hors ligne et onglet Page) | `node studio/tests/e2e.mjs` |
+| Sites créés par `kplus --site`, dans Chromium | `node studio/tests/site_e2e.mjs` |
 | Même test sur le site en ligne | `node studio/tests/e2e.mjs --url https://manassekito17-star.github.io/K-/` |
 
 Le test de bout en bout ouvre K+ Studio dans un vrai navigateur et l'utilise

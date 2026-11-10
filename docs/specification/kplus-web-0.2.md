@@ -1,7 +1,9 @@
 # K+ Web — spécification (proposition pour K+ 0.2)
 
-> **Statut : PROPOSITION, en attente de validation.** Rien de ce document n'est
-> encore implémenté. K+ 0.1 ne sait pas créer de pages web.
+> **Statut : implémenté dans K+ 0.2** (spécification validée par le responsable
+> du projet). Moteur : `kplus/web.py` ; affichage : `kplus/rendu_web.js` ;
+> export : `kplus/site.py`. Tests : `tests/test_web.py`, `tests/test_site.py`,
+> `studio/tests/e2e.mjs` (onglet Page) et `studio/tests/site_e2e.mjs` (site exporté).
 
 ## 1. Objectif
 

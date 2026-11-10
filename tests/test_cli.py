@@ -28,7 +28,7 @@ class TestLigneDeCommande(unittest.TestCase):
         return chemin
 
     def test_version_et_aide(self):
-        self.assertEqual(kplus("--version").stdout, "K+ 0.1.0\n")
+        self.assertEqual(kplus("--version").stdout, f"K+ {__import__('kplus').__version__}\n")
         r = kplus("--aide")
         self.assertEqual(r.returncode, 0)
         self.assertIn("kplus --verifier", r.stdout)

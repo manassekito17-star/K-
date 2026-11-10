@@ -106,6 +106,23 @@ exports.run = async function () {
     assert.match(portee("majeur"), /comment\.line/);
   });
 
+  await cas("K+ Web : couleurs de « utiliser web » et des fonctions web, erreur de placement", async () => {
+    const { document } = await ouvrir(dossier, "site.kplus",
+      'utiliser web\ntitre("Mon site")\nbouton("OK", afficher)\n');
+    const jetons = await vscode.commands.executeCommand("_workbench.captureSyntaxTokens", document.uri);
+    const portee = (t) => (jetons.find((x) => x.c.trim() === t) || { t: "(introuvable)" }).t;
+    assert.match(portee("utiliser"), /keyword\.control\.kplus/);
+    assert.match(portee("titre"), /support\.function\.web\.kplus/);
+    assert.match(portee("bouton"), /support\.function\.web\.kplus/);
+    await pause(1500);
+    assert.strictEqual(diagnostics(document).length, 0);
+    const mauvais = await ouvrir(dossier, "site-faux.kplus", "si vrai alors\n    utiliser web\nfin\n");
+    const [d] = await attendre(() => diagnostics(mauvais.document).length && diagnostics(mauvais.document),
+                               "diagnostic utiliser");
+    assert.strictEqual(d.range.start.line, 1);
+    assert.match(d.message, /niveau principal/);
+  });
+
   await cas("raccourcis d'écriture (snippets) proposés", async () => {
     const { document } = await ouvrir(dossier, "snippets.kplus", "si");
     const liste = await vscode.commands.executeCommand("vscode.executeCompletionItemProvider",

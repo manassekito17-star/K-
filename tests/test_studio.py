@@ -174,6 +174,10 @@ class TestColoration(unittest.TestCase):
     def test_natives(self):
         self.assertEqual(self.liste_js("NATIVES"), set(NOMS_NATIFS))
 
+    def test_natives_web(self):
+        from kplus.web import NOMS_WEB
+        self.assertEqual(self.liste_js("NATIVES_WEB"), set(NOMS_WEB))
+
 
 if __name__ == "__main__":
     unittest.main()

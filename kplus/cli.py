@@ -20,6 +20,8 @@ AIDE = f"""K+ {__version__} — langage de programmation en français
 Utilisation :
   kplus programme.kplus             exécute un programme
   kplus --verifier programme.kplus  vérifie un programme sans l'exécuter
+  kplus --site programme.kplus [dossier]
+                                    crée un site web à partir d'un programme K+ Web
   kplus                             lance le mode interactif
   kplus --version                   affiche la version
   kplus --aide                      affiche cette aide
@@ -174,6 +176,32 @@ def mode_interactif():
             print(representer(valeur, imbrique=True))
 
 
+def creer_site_web(chemin, dossier):
+    from pathlib import Path
+    from .site import ErreurSite, creer_site
+    source, probleme = lire_fichier(chemin)
+    if probleme:
+        ecrire_erreur(probleme)
+        return ERREUR_UTILISATION
+    programme = Path(chemin)
+    cible = Path(dossier) if dossier else programme.with_name(programme.stem + "_site")
+    try:
+        creer_site(source, cible, titre=programme.stem.replace("_", " "))
+    except ErreurKPlus as e:
+        ecrire_erreur(formater_erreur(e, source))
+        return ERREUR_KPLUS
+    except ErreurSite as e:
+        ecrire_erreur(f"Erreur : {e}")
+        return ERREUR_UTILISATION
+    print(f"Site créé dans le dossier : {cible}")
+    print("Pour l'essayer sur cet ordinateur :")
+    print(f"    python -m http.server --directory \"{cible}\"")
+    print("puis ouvrez http://localhost:8000 dans le navigateur.")
+    print("Pour le publier : envoyez le contenu du dossier chez un hébergeur de sites statiques "
+          "(GitHub Pages, Netlify…). Les visiteurs ont besoin d'Internet au premier chargement.")
+    return SUCCES
+
+
 def principal(argv=None) -> int:
     argv = sys.argv[1:] if argv is None else argv
     configurer_flux()
@@ -186,6 +214,12 @@ def principal(argv=None) -> int:
     if premier in ("--aide", "--help", "-h"):
         print(AIDE)
         return SUCCES
+    if premier == "--site":
+        if len(argv) not in (2, 3):
+            ecrire_erreur("Erreur : --site attend un programme, et éventuellement un dossier.\n"
+                          "Exemple : kplus --site mon_site.kplus")
+            return ERREUR_UTILISATION
+        return creer_site_web(argv[1], argv[2] if len(argv) == 3 else None)
     if premier == "--verifier":
         if len(argv) != 2:
             ecrire_erreur("Erreur : --verifier attend exactement un fichier.\n"

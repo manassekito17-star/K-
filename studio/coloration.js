@@ -26,8 +26,16 @@
     "afficher", "demander", "texte", "entier", "decimal", "décimal", "type",
     "longueur", "ajouter", "absolu", "racine", "arrondir", "quitter",
   ];
+  // Fonctions de la bibliothèque web (« utiliser web »).
+  const NATIVES_WEB = [
+    "ajouter_ligne", "arreter_minuterie", "bouton", "cacher", "champ",
+    "changer_texte", "changer_valeur", "couleur", "couleur_fond", "image", "lien",
+    "liste", "montrer", "paragraphe", "placer", "quand_change", "quand_clic",
+    "sous_titre", "supprimer", "texte_de", "titre", "titre_page", "toutes_les",
+    "valeur", "vider", "zone",
+  ];
   const ENSEMBLE_MOTS_CLES = new Set(MOTS_CLES);
-  const ENSEMBLE_NATIVES = new Set(NATIVES);
+  const ENSEMBLE_NATIVES = new Set([...NATIVES, ...NATIVES_WEB]);
 
   const est_chiffre = (c) => c >= "0" && c <= "9";
   const est_debut_nom = (c) => c === "_" || /\p{L}/u.test(c);
@@ -133,7 +141,7 @@
     return lignes;
   }
 
-  const api = { MOTS_CLES, NATIVES, decouper, colorer_lignes, echapper };
+  const api = { MOTS_CLES, NATIVES, NATIVES_WEB, decouper, colorer_lignes, echapper };
   if (typeof module !== "undefined" && module.exports) module.exports = api;
   else racine.KPlusColoration = api;
 })(typeof window !== "undefined" ? window : globalThis);

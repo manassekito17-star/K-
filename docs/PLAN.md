@@ -117,3 +117,16 @@ planter Pyodide).
   téléchargeable sur le site.
 - Pistes suivantes : paquet installable (PyPI), première étape vers un
   compilateur.
+
+## Phase 6 — Bibliothèques avancées (en cours)
+
+Feuille de route validée : [FEUILLE-DE-ROUTE.md](FEUILLE-DE-ROUTE.md).
+
+- **K+ 0.2 — K+ Web (livrée)** : `utiliser web`, pages dynamiques dans le
+  navigateur (titres, boutons, champs, listes, images, liens, zones,
+  couleurs, clics, saisies, minuteries), onglet **Page** de K+ Studio,
+  export d'un site publiable (`kplus --site`), coloration dans K+ Studio et
+  VS Code. Spécification : [kplus-web-0.2.md](specification/kplus-web-0.2.md).
+- **Prochaine étape : K+ 0.3**, sites côté serveur à la manière de PHP et
+  Python, puis la formation « Sites web dynamiques avec K+ » dans UPL Code
+  Académie.

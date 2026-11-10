@@ -91,6 +91,10 @@ class TestCoherence(unittest.TestCase):
     def test_natives_identiques_au_moteur(self):
         self.assertEqual(self.mots("natives"), set(NOMS_NATIFS))
 
+    def test_natives_web_identiques_au_moteur(self):
+        from kplus.web import NOMS_WEB
+        self.assertEqual(self.mots("natives-web"), set(NOMS_WEB))
+
     def test_fiche_de_l_extension(self):
         p = self.paquet
         self.assertEqual(p["version"], __version__)

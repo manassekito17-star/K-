@@ -48,6 +48,8 @@ jobs:
         run: node studio/tests/e2e.mjs
       - name: Test dans un sous-dossier (comme sur GitHub Pages)
         run: node studio/tests/e2e.mjs --sous-chemin K-
+      - name: Sites créés par kplus --site (K+ Web)
+        run: node studio/tests/site_e2e.mjs
 
   vscode:
     name: Extension VS Code

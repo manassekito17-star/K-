@@ -683,7 +683,7 @@ Commande : `kplus` (installée avec `pip install .`, voir le README), ou
 | `kplus programme.kplus` | Analyse puis exécute le fichier. |
 | `kplus --verifier programme.kplus` | Analyse seulement (lexique + syntaxe) ; affiche `Aucune erreur détectée.` ou l'erreur. N'exécute rien. |
 | `kplus` | Mode interactif : chaque ligne (ou bloc complet jusqu'à son `fin`) est exécutée immédiatement ; la valeur d'une expression seule est affichée. Les variables sont conservées entre les saisies. Une erreur affiche son message sans quitter. On quitte avec `quitter()` ou Ctrl+D (Linux/macOS) / Ctrl+Z puis Entrée (Windows). |
-| `kplus --version` | Affiche `K+ 0.1.0`. |
+| `kplus --version` | Affiche la version, par exemple `K+ 0.2.0`. |
 | `kplus --aide` | Affiche l'aide. |
 
 **Codes de sortie** (utiles pour l'automatisation) :
@@ -703,6 +703,11 @@ message clair et le code `2`.
 ---
 
 ## 11. Hors du périmètre de K+ 0.1
+
+> **K+ 0.2** ajoute le mot-clé `utiliser` et la bibliothèque web
+> (`utiliser web`) : voir [kplus-web-0.2.md](kplus-web-0.2.md). Le reste de
+> ce document s'applique sans changement à K+ 0.2.
+
 
 Ces éléments sont volontairement **reportés** (versions suivantes) :
 

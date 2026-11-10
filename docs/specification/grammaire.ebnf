@@ -56,7 +56,8 @@ TEXTE         = '"' , { car_texte_droit | echappement } , '"'
      arreter (arrêter) continuer
      essayer attraper lever
      et ou non
-     vrai faux nul                                                       *)
+     vrai faux nul
+     utiliser                                   (K+ 0.2)                *)
 
 (* Symboles :
      ( ) [ ] , = + - * / % ^ == != < <= > >=                             *)
@@ -85,6 +86,7 @@ instruction     = declaration_variable
                 | instr_essayer
                 | instr_retourner
                 | instr_lever
+                | instr_utiliser
                 | "arreter" | "arrêter"
                 | "continuer"
                 | affectation
@@ -144,6 +146,10 @@ instr_essayer   = "essayer" , NL , bloc ,
                   "fin" ;
 
 instr_lever     = "lever" , expression ;
+
+(* K+ 0.2 : bibliothèques. Contrainte : uniquement au niveau principal du
+   programme. Bibliothèque disponible : web (docs/specification/kplus-web-0.2.md). *)
+instr_utiliser  = "utiliser" , IDENT ;
 
 
 (* ==========================================================================
