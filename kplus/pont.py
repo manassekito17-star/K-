@@ -167,3 +167,24 @@ def evenement(identifiant: str, genre: str, valeurs: str, envoyer) -> str:
     if erreur:
         resultat["texte_erreur"] = erreur
     return json.dumps(resultat)
+
+
+def executer_test(source: str, entree: str) -> str:
+    """Exécution d'un test d'exercice (UPL Code Académie) : sortie du programme,
+    ou description de la page pour un programme web dont l'entrée est un
+    scénario (voir kplus/scenario.py)."""
+    from kplus.scenario import ErreurScenario, executer_test as executer
+    debut = time.monotonic()
+    try:
+        sortie, erreur = executer(source, entree)
+        resultat = {"statut": "ok", "sortie": sortie}
+        if erreur is not None:
+            resultat = {"statut": "erreur", "sortie": sortie, "erreur": decrire_erreur(erreur, source)}
+    except ErreurKPlus as e:
+        resultat = {"statut": "erreur", "sortie": "", "erreur": decrire_erreur(e, source)}
+    except ErreurScenario as e:
+        resultat = {"statut": "scenario", "sortie": "", "message": str(e)}
+    except SignalQuitter:
+        resultat = {"statut": "ok", "sortie": ""}
+    resultat["duree_ms"] = round((time.monotonic() - debut) * 1000)
+    return json.dumps(resultat)

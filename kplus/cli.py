@@ -20,6 +20,8 @@ AIDE = f"""K+ {__version__} — langage de programmation en français
 Utilisation :
   kplus programme.kplus             exécute un programme
   kplus --verifier programme.kplus  vérifie un programme sans l'exécuter
+  kplus --scenario site.kplus visite.txt
+                                    simule un visiteur et décrit la page obtenue
   kplus --site programme.kplus [dossier]
                                     crée un site web à partir d'un programme K+ Web
   kplus                             lance le mode interactif
@@ -176,6 +178,24 @@ def mode_interactif():
             print(representer(valeur, imbrique=True))
 
 
+def jouer_scenario(chemin, chemin_scenario):
+    from .scenario import ErreurScenario, jouer
+    source, probleme = lire_fichier(chemin)
+    scenario, probleme2 = lire_fichier(chemin_scenario)
+    if probleme or probleme2:
+        ecrire_erreur(probleme or probleme2)
+        return ERREUR_UTILISATION
+    try:
+        print(jouer(source, scenario), end="")
+    except ErreurKPlus as e:
+        ecrire_erreur(formater_erreur(e, source))
+        return ERREUR_KPLUS
+    except ErreurScenario as e:
+        ecrire_erreur(f"Erreur : {e}")
+        return ERREUR_KPLUS
+    return SUCCES
+
+
 def creer_site_web(chemin, dossier):
     from pathlib import Path
     from .site import ErreurSite, creer_site
@@ -214,6 +234,12 @@ def principal(argv=None) -> int:
     if premier in ("--aide", "--help", "-h"):
         print(AIDE)
         return SUCCES
+    if premier == "--scenario":
+        if len(argv) != 3:
+            ecrire_erreur("Erreur : --scenario attend un programme web et un fichier de scénario.\n"
+                          "Exemple : kplus --scenario site.kplus visite.txt")
+            return ERREUR_UTILISATION
+        return jouer_scenario(argv[1], argv[2])
     if premier == "--site":
         if len(argv) not in (2, 3):
             ecrire_erreur("Erreur : --site attend un programme, et éventuellement un dossier.\n"
