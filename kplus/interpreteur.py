@@ -30,6 +30,10 @@ class Interpreteur:
         self.globales = Environnement(natives=self.noms_natifs)
         natives.installer(self.globales)
         self.page = None             # modèle de la page web (« utiliser web »)
+        self.serveur = None          # application « utiliser serveur »
+        self.fichier_donnees = ":memory:"   # tables du serveur (fichier SQLite)
+        self.production = False      # serveur : détails des erreurs masqués
+        self.source = None           # texte du programme (messages d'erreur du serveur)
         self.noeud_appel = None      # appel de fonction native en cours
         self.profondeur = 0
         self.interrompu = False      # mis à vrai par Ctrl+C
@@ -216,20 +220,37 @@ class Interpreteur:
                 self.executer(instruction, gestion)
 
     def _utiliser(self, n: ast.Utiliser, env):
-        if n.bibliotheque != "web":
+        if n.bibliotheque not in ("web", "serveur"):
             raise ErreurNom(f"bibliothèque « {n.bibliotheque} » inconnue",
-                            n.ligne, n.colonne, "bibliothèque disponible : web")
-        if self.page is not None:
+                            n.ligne, n.colonne, "bibliothèques disponibles : web, serveur")
+        active = "web" if self.page is not None else "serveur" if self.serveur is not None else None
+        if active == n.bibliotheque:
             return                                   # déjà activée
-        from . import web
-        for nom in web.NOMS_WEB:
+        if active is not None:
+            raise ErreurNom(
+                "un programme ne peut pas utiliser à la fois « web » et « serveur »",
+                n.ligne, n.colonne,
+                "« utiliser web » fait réagir une page dans le navigateur ; « utiliser serveur » "
+                "construit les pages sur le serveur : choisissez l'un des deux")
+        if n.bibliotheque == "web":
+            from . import web as module
+            noms = module.NOMS_WEB
+        else:
+            from . import serveur as module
+            noms = module.NOMS_SERVEUR
+        for nom in sorted(noms):
             if nom in self.globales.valeurs:
                 raise ErreurNom(
                     f"« {nom} » est déjà utilisé dans ce programme, mais c'est aussi "
-                    f"une fonction de la bibliothèque web", n.ligne, n.colonne,
-                    f"renommez « {nom} », ou placez « utiliser web » au tout début du programme")
-        self.page = web.Page()
-        for nom, fonction in web.fonctions_natives().items():
+                    f"une fonction de la bibliothèque {n.bibliotheque}", n.ligne, n.colonne,
+                    f"renommez « {nom} », ou placez « utiliser {n.bibliotheque} » au tout début "
+                    f"du programme")
+        if n.bibliotheque == "web":
+            self.page = module.Page()
+        else:
+            self.serveur = module.Application(self, self.fichier_donnees, self.production)
+            self.serveur.source = self.source
+        for nom, fonction in module.fonctions_natives().items():
             self.globales.definir_native(nom, fonction)
             self.noms_natifs.add(nom)
 

@@ -100,5 +100,19 @@
       "bouton(\"${2:Cliquez}\", ${1:action})"
     ],
     "description": "Bouton et son action (K+ Web)"
+  },
+  "Commencer un site côté serveur": {
+    "prefix": "utiliserserveur",
+    "body": [
+      "utiliser serveur",
+      "",
+      "fonction ${1:accueil}()",
+      "\ttitre(\"${2:Mon site}\")",
+      "\t$0",
+      "fin",
+      "",
+      "page(\"/\", ${1:accueil})"
+    ],
+    "description": "Commencer un site côté serveur (K+ Serveur)"
   }
 }

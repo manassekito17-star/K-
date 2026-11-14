@@ -185,6 +185,10 @@
     "natives-web": {
       "name": "support.function.web.kplus",
       "match": "(?<![\\p{L}\\p{M}\\p{N}_])(ajouter_ligne|arreter_minuterie|bouton|cacher|champ|changer_texte|changer_valeur|couleur|couleur_fond|image|lien|liste|montrer|paragraphe|placer|quand_change|quand_clic|sous_titre|supprimer|texte_de|titre|titre_page|toutes_les|valeur|vider|zone)(?![\\p{L}\\p{M}\\p{N}_])(?=\\s*\\()"
+    },
+    "natives-serveur": {
+      "name": "support.function.serveur.kplus",
+      "match": "(?<![\\p{L}\\p{M}\\p{N}_])(bouton_envoyer|champ_texte|chiffrer_mot_de_passe|compter|donnee|effacer|enregistrer|formulaire|formulaire_recu|lire|lire_tout|modifier|mot_de_passe|oublier|page|parametre|rediriger|retenir|session|verifier_mot_de_passe|zone_texte)(?![\\p{L}\\p{M}\\p{N}_])(?=\\s*\\()"
     }
   }
 }

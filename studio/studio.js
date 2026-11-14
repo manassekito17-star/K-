@@ -55,6 +55,7 @@
   let pret = false;
   let enCours = false;
   let pageActive = false;              // page K+ Web vivante (clics, minuteries)
+  let serveurActif = false;            // site « utiliser serveur » en aperçu
   let prochaineRequete = 1;
   const evenementsEnAttente = new Map(); // requête -> fonction de fin
   let ligneErreur = null;
@@ -289,7 +290,7 @@
 
   function mettreAJourBoutons() {
     boutonExecuter.disabled = !pret || enCours;
-    boutonArreter.disabled = !enCours && !pageActive;
+    boutonArreter.disabled = !enCours && !pageActive && !serveurActif;
   }
 
   // --- Page K+ Web (« utiliser web ») -----------------------------------------------
@@ -345,12 +346,72 @@
   function fermerPage() {
     rendu.arreterMinuteries();
     pageActive = false;
+    serveurActif = false;
     mettreAJourBoutons();
   }
+
+  // --- Aperçu d'un site côté serveur (« utiliser serveur ») ---------------------------
+  // Le site tourne en mémoire dans le travailleur (vrai moteur, sans réseau). Sa page
+  // s'affiche dans un cadre isolé où les scripts sont interdits ; les liens et les
+  // boutons d'envoi sont interceptés ici et transmis au moteur.
+
+  const pageWeb = $("page-web");
+  const pageServeur = $("page-serveur");
+  const barreServeur = $("barre-serveur");
+  const adresseServeur = $("adresse-serveur");
+
+  function afficherServeur(visite) {
+    pageWeb.hidden = true;
+    barreServeur.hidden = false;
+    pageServeur.hidden = false;
+    adresseServeur.textContent = visite.adresse + (visite.statut === 200 ? "" : `  (${visite.statut})`);
+    pageServeur.srcdoc = visite.html;
+  }
+
+  function visiterServeur(methode, adresse, champs) {
+    if (!serveurActif || !pret) return;
+    const requete = prochaineRequete++;
+    evenementsEnAttente.set(requete, () => {});
+    travailleur.postMessage({ type: "serveur", methode, adresse, champs, requete });
+  }
+
+  function envoyerFormulaire(formulaire) {
+    const champs = [...new FormData(formulaire).entries()].map(([nom, valeur]) => [nom, String(valeur)]);
+    visiterServeur("POST", formulaire.getAttribute("action") || "/", champs);
+  }
+
+  pageServeur.addEventListener("load", () => {
+    const doc = pageServeur.contentDocument;
+    if (!doc) return;
+    titrePageWeb.textContent = doc.title || "";
+    doc.addEventListener("click", (e) => {
+      const lien = e.target.closest && e.target.closest("a[href]");
+      const bouton = e.target.closest && e.target.closest("button[type=submit]");
+      if (lien) {
+        e.preventDefault();
+        const href = lien.getAttribute("href");
+        if (href.startsWith("/")) visiterServeur("GET", href, []);
+        else window.open(lien.href, "_blank", "noopener");
+      } else if (bouton && bouton.form) {
+        e.preventDefault();
+        envoyerFormulaire(bouton.form);
+      }
+    });
+    doc.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" && e.target.tagName === "INPUT" && e.target.form) {
+        e.preventDefault();
+        envoyerFormulaire(e.target.form);
+      }
+    });
+  });
 
   function nouvellePage() {
     fermerPage();
     rendu.vider();
+    pageWeb.hidden = false;
+    barreServeur.hidden = true;
+    pageServeur.hidden = true;
+    pageServeur.removeAttribute("srcdoc");
     titrePageWeb.textContent = "";
     ongletPage.hidden = true;
     montrerOnglet("console");
@@ -390,6 +451,10 @@
         break;
       case "evenement_fin":
         terminerEvenement(message);
+        break;
+      case "serveur_fin":
+        evenementsEnAttente.delete(message.requete);
+        if (serveurActif) afficherServeur(message.resultat);
         break;
     }
   }
@@ -437,10 +502,21 @@
       changerEtat("Page web active", "pret");
       mettreAJourBoutons();
     }
+    if (resultat.serveur) {
+      serveurActif = true;
+      ongletPage.hidden = false;
+      afficherServeur(resultat.visite);
+      montrerOnglet("page");
+      ajouterLigneSysteme("Site côté serveur : aperçu dans l'onglet Page (pages : " +
+                          resultat.pages.join(", ") + "). Les données sont en mémoire et " +
+                          "s'effacent à la prochaine exécution. Vrai serveur : kplus --serveur fichier.kplus");
+      changerEtat("Site côté serveur en aperçu", "pret");
+      mettreAJourBoutons();
+    }
   }
 
   function arreter() {
-    if (!enCours && !pageActive) return;
+    if (!enCours && !pageActive && !serveurActif) return;
     const occupe = enCours || evenementsEnAttente.size > 0;
     fermerPage();
     if (occupe) {

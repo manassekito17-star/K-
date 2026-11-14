@@ -40,7 +40,7 @@ class Element:
 
     __slots__ = ("id", "genre", "texte", "valeur", "etiquette", "adresse",
                  "description", "parent", "enfants", "actions", "supprime",
-                 "ligne")
+                 "ligne", "nom")
 
     def __init__(self, ident, genre, texte="", ligne=None):
         self.id = ident
@@ -55,6 +55,7 @@ class Element:
         self.actions = {}               # « clic », « change », « minuterie »
         self.supprime = False
         self.ligne = ligne              # ligne du programme qui l'a créé
+        self.nom = ""                   # nom d'un champ de formulaire (« utiliser serveur »)
 
 
 def est_nombre(v) -> bool:

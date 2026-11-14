@@ -1,0 +1,29 @@
+# Livre d'or : site côté serveur (K+ 0.3)
+# Lancer : kplus --serveur exemples/serveur_livre_or.kplus
+# puis ouvrir http://localhost:8000
+utiliser serveur
+
+fonction accueil()
+    titre_page("Livre d'or")
+    titre("Livre d'or de la classe")
+    variable nombre = compter("messages")
+    paragraphe(texte(nombre) + " message(s)")
+    variable messages = liste()
+    pour chaque m dans lire_tout("messages") faire
+        ajouter_ligne(messages, m[1] + " : " + m[2])
+    fin
+    variable f = formulaire("/ecrire")
+    champ_texte(f, "nom", "Votre nom")
+    zone_texte(f, "message", "Votre message")
+    bouton_envoyer(f, "Publier")
+fin
+
+fonction ecrire()
+    si donnee("nom") != "" et donnee("message") != "" alors
+        enregistrer("messages", [donnee("nom"), donnee("message")])
+    fin
+    rediriger("/")
+fin
+
+page("/", accueil)
+formulaire_recu("/ecrire", ecrire)

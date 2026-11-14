@@ -16,7 +16,7 @@ lorsqu'elle fonctionne et qu'elle est testée.
 |---|---|---|---|
 | **0.1** ✓ | Bases : variables, conditions, boucles, fonctions, listes, erreurs | Python, pseudocode | `si age >= 18 alors … fin` |
 | **0.2** ✓ | **Sites dynamiques dans le navigateur** : pages, boutons, champs, événements, minuteries, export d'un site publiable | JavaScript, HTML, CSS | `bouton("Calculer", calculer)` |
-| **0.3** | **Sites côté serveur** : pages générées par le serveur, formulaires, adresses (`/contact`), base de données, sessions, commande `kplus --serveur` | PHP, Python (Flask, Django) | `page "/bonjour" faire … fin` |
+| **0.3** ✓ | **Sites côté serveur** : pages générées par le serveur, formulaires, adresses (`/contact`), base de données, sessions, commande `kplus --serveur` | PHP, Python (Flask, Django) | `page("/", accueil)` |
 | **0.4** | **Données et organisation** : dictionnaires, textes avec `{variables}`, textes sur plusieurs lignes, modules (`utiliser`), mise en forme de la page façon CSS (`style`) | Python, JavaScript, PHP, CSS | `variable eleve = {"nom": "Awa", "note": 15}` |
 | **0.5** | **Programmation objet** : classes, objets, méthodes, héritage | Java, C#, C++, Python | `classe Compte … fin` |
 | **0.6** | **Types facultatifs** : `variable age : entier = 20`, erreurs détectées avant l'exécution | C#, Java, C, TypeScript | `fonction carre(x : entier) : entier` |

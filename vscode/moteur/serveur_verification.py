@@ -7,7 +7,7 @@ K+ (copié à côté, dans moteur/kplus/), sans exécuter le programme.
 Protocole : une ligne JSON par message, en UTF-8.
     entrée  : {"id": 3, "source": "afficher(1"}
     sortie  : {"id": 3, "ok": false, "erreur": {...}}   ou   {"id": 3, "ok": true}
-Au démarrage, le serveur écrit {"pret": true, "version": "0.2.0"}.
+Au démarrage, le serveur écrit {"pret": true, "version": "0.3.0"}.
 """
 
 import json

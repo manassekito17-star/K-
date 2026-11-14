@@ -1,7 +1,8 @@
-# K+ Serveur — spécification (proposition pour K+ 0.3)
+# K+ Serveur — spécification (K+ 0.3)
 
-> **Statut : PROPOSITION, en attente de validation.** Rien de ce document n'est
-> encore implémenté.
+> **Statut : validée et implémentée** dans K+ 0.3.0 (`kplus/serveur.py`),
+> testée par `tests/test_serveur.py`. Exemples : `exemples/serveur_livre_or.kplus`,
+> `exemples/serveur_comptes.kplus`.
 
 ## 1. Objectif
 
@@ -139,6 +140,28 @@ textes ou de nombres. Le serveur les garde dans un fichier
 **Héberger.** Il faut un hébergeur qui exécute Python (Render,
 PythonAnywhere, un serveur personnel…). GitHub Pages ne convient pas : il ne
 sert que des sites statiques.
+
+## 6 bis. Précisions de l'implémentation
+
+- **`donnee(nom)`** lit aussi les paramètres d'une adresse visitée
+  (`/recherche?q=k`), pour les formulaires de recherche.
+- **`effacer(table, numero)`** renvoie `vrai` si la ligne existait, `faux`
+  sinon. **`modifier`** sur une ligne absente est une erreur. Les numéros ne
+  sont jamais réutilisés après un effacement.
+- **`rediriger`** n'accepte que les adresses du site (qui commencent par `/`).
+- **`session`/`retenir`** : textes, nombres, booléens, `nul` ou listes de ces
+  valeurs. Les sessions sont gardées en mémoire : elles s'effacent quand le
+  serveur redémarre (les tables, elles, sont conservées).
+- **Durée** : une visite qui calcule plus de 10 secondes est arrêtée
+  (erreur 500), le serveur continue de répondre aux autres.
+- **`afficher`** écrit dans le terminal du serveur (journal), pas dans la page.
+- **`--production`** : le site écoute sur toutes les adresses (`0.0.0.0`), sur
+  le port de la variable `PORT` s'il existe (Render…), et le cookie exige
+  HTTPS (`Secure`).
+- **Aperçu sans serveur** : K+ Studio exécute le site en mémoire dans le
+  navigateur et affiche ses pages. Les données y sont gardées en mémoire (elles
+  disparaissent à la prochaine exécution), et les mots de passe y sont
+  chiffrés avec PBKDF2-SHA256, car le Python du navigateur n'a pas scrypt.
 
 ## 7. Limites de 0.3
 

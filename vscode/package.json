@@ -2,7 +2,7 @@
   "name": "kplus",
   "displayName": "K+",
   "description": "Langage K+ (programmation en français) : couleurs, correction des erreurs pendant la saisie, exécution.",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "publisher": "kplus-langage",
   "icon": "icones/icone-512.png",
   "repository": {

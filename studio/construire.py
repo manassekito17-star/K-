@@ -37,6 +37,8 @@ TITRES_EXEMPLES = {
     "site_calculatrice": "Site web : calculatrice",
     "site_taches": "Site web : liste de tâches",
     "site_chronometre": "Site web : chronomètre",
+    "serveur_livre_or": "Site côté serveur : livre d'or",
+    "serveur_comptes": "Site côté serveur : comptes et connexion",
 }
 
 

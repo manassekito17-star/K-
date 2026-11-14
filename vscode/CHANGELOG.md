@@ -1,5 +1,11 @@
 # Historique
 
+## 0.3.0
+
+- K+ Serveur : coloration des fonctions de la bibliothèque serveur (`page`,
+  `formulaire`, `enregistrer`, `session`…), correction avec le moteur K+ 0.3.
+- Extrait `utiliserserveur`.
+
 ## 0.2.0
 
 - K+ Web : mot-clé `utiliser`, coloration des fonctions de la bibliothèque

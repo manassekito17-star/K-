@@ -127,6 +127,11 @@ Feuille de route validée : [FEUILLE-DE-ROUTE.md](FEUILLE-DE-ROUTE.md).
   couleurs, clics, saisies, minuteries), onglet **Page** de K+ Studio,
   export d'un site publiable (`kplus --site`), coloration dans K+ Studio et
   VS Code. Spécification : [kplus-web-0.2.md](specification/kplus-web-0.2.md).
-- **Prochaine étape : K+ 0.3**, sites côté serveur à la manière de PHP et
-  Python, puis la formation « Sites web dynamiques avec K+ » dans UPL Code
-  Académie.
+- **K+ 0.3 — K+ Serveur (livrée)** : `utiliser serveur`, pages et
+  adresses (`page`, `parametre`, `rediriger`), formulaires, tables
+  enregistrées (SQLite), sessions, mots de passe chiffrés (scrypt),
+  protection CSRF, commande `kplus --serveur`, aperçu du site dans K+ Studio.
+  Spécification : [kplus-serveur-0.3.md](specification/kplus-serveur-0.3.md).
+- La formation « Sites web dynamiques avec K+ » est en ligne dans UPL Code
+  Académie (niveaux 1 et 2 ; le niveau 3 couvrira K+ Serveur).
+- **Prochaine étape : K+ 0.4** (dictionnaires, modules, mise en forme).

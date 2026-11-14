@@ -1,0 +1,76 @@
+# Comptes : inscription, connexion, page privée (K+ 0.3)
+# Lancer : kplus --serveur exemples/serveur_comptes.kplus
+utiliser serveur
+
+# Renvoie la ligne du compte qui porte ce nom, ou nul.
+fonction chercher(nom)
+    pour chaque c dans lire_tout("comptes") faire
+        si c[1] == nom alors
+            retourner c
+        fin
+    fin
+    retourner nul
+fin
+
+fonction accueil()
+    titre_page("Mon espace")
+    variable nom = session("utilisateur")
+    si nom == nul alors
+        titre("Bienvenue")
+        paragraphe("Créez un compte ou connectez-vous.")
+        variable message = session("message")
+        si message != nul alors
+            couleur(paragraphe(message), "rouge")
+            oublier("message")
+        fin
+        sous_titre("Connexion")
+        variable c = formulaire("/connexion")
+        champ_texte(c, "nom", "Nom d'utilisateur")
+        mot_de_passe(c, "mdp", "Mot de passe")
+        bouton_envoyer(c, "Se connecter")
+        sous_titre("Inscription")
+        variable i = formulaire("/inscription")
+        champ_texte(i, "nom", "Nom d'utilisateur")
+        mot_de_passe(i, "mdp", "Mot de passe (8 caractères au moins)")
+        bouton_envoyer(i, "Créer mon compte")
+    sinon
+        titre("Bonjour " + nom + " !")
+        paragraphe("Vous êtes connecté. " + texte(compter("comptes")) + " compte(s) sur ce site.")
+        variable d = formulaire("/deconnexion")
+        bouton_envoyer(d, "Se déconnecter")
+    fin
+fin
+
+fonction inscription()
+    variable nom = donnee("nom")
+    variable mdp = donnee("mdp")
+    si nom == "" ou longueur(mdp) < 8 alors
+        retenir("message", "Choisissez un nom et un mot de passe de 8 caractères au moins.")
+    sinon si chercher(nom) != nul alors
+        retenir("message", "Ce nom est déjà pris.")
+    sinon
+        enregistrer("comptes", [nom, chiffrer_mot_de_passe(mdp)])
+        retenir("utilisateur", nom)
+    fin
+    rediriger("/")
+fin
+
+fonction connexion()
+    variable compte = chercher(donnee("nom"))
+    si compte != nul et verifier_mot_de_passe(donnee("mdp"), compte[2]) alors
+        retenir("utilisateur", compte[1])
+    sinon
+        retenir("message", "Nom ou mot de passe incorrect.")
+    fin
+    rediriger("/")
+fin
+
+fonction deconnexion()
+    oublier("utilisateur")
+    rediriger("/")
+fin
+
+page("/", accueil)
+formulaire_recu("/inscription", inscription)
+formulaire_recu("/connexion", connexion)
+formulaire_recu("/deconnexion", deconnexion)

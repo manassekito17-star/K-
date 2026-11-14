@@ -34,8 +34,15 @@
     "sous_titre", "supprimer", "texte_de", "titre", "titre_page", "toutes_les",
     "valeur", "vider", "zone",
   ];
+  // Fonctions de la bibliothèque serveur (« utiliser serveur »), en plus de celles de la page.
+  const NATIVES_SERVEUR = [
+    "bouton_envoyer", "champ_texte", "chiffrer_mot_de_passe", "compter", "donnee",
+    "effacer", "enregistrer", "formulaire", "formulaire_recu", "lire", "lire_tout",
+    "modifier", "mot_de_passe", "oublier", "page", "parametre", "rediriger",
+    "retenir", "session", "verifier_mot_de_passe", "zone_texte",
+  ];
   const ENSEMBLE_MOTS_CLES = new Set(MOTS_CLES);
-  const ENSEMBLE_NATIVES = new Set([...NATIVES, ...NATIVES_WEB]);
+  const ENSEMBLE_NATIVES = new Set([...NATIVES, ...NATIVES_WEB, ...NATIVES_SERVEUR]);
 
   const est_chiffre = (c) => c >= "0" && c <= "9";
   const est_debut_nom = (c) => c === "_" || /\p{L}/u.test(c);
@@ -141,7 +148,7 @@
     return lignes;
   }
 
-  const api = { MOTS_CLES, NATIVES, NATIVES_WEB, decouper, colorer_lignes, echapper };
+  const api = { MOTS_CLES, NATIVES, NATIVES_WEB, NATIVES_SERVEUR, decouper, colorer_lignes, echapper };
   if (typeof module !== "undefined" && module.exports) module.exports = api;
   else racine.KPlusColoration = api;
 })(typeof window !== "undefined" ? window : globalThis);

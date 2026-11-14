@@ -113,7 +113,7 @@ try {
     ? await page.evaluate(async () => (await fetch("manifeste.json")).json())
     : JSON.parse(readFileSync(path.join(RACINE, "studio/dist/manifeste.json"), "utf8"));
   // Les sites (« utiliser web ») sont testés plus bas, dans l'onglet Page.
-  for (const exemple of manifeste.exemples.filter((x) => !x.nom.startsWith("site_"))) {
+  for (const exemple of manifeste.exemples.filter((x) => !/^(site|serveur)_/.test(x.nom))) {
     await page.selectOption("#choix-exemple", exemple.nom);
     await page.waitForFunction((n) => document.getElementById("nom-fichier").textContent === n + ".kplus",
                                 exemple.nom);
@@ -204,7 +204,7 @@ try {
   page.on("dialog", (d) => { if (d.type() === "alert") alerteOuverte = true; });
   const cadre = page.locator("#page-web");
   async function lancerSite(nomOuSource) {
-    if (nomOuSource.startsWith("site_")) {
+    if (/^(site|serveur)_/.test(nomOuSource)) {
       await page.selectOption("#choix-exemple", nomOuSource);
       await page.waitForFunction((n) => document.getElementById("nom-fichier").textContent === n + ".kplus", nomOuSource);
     } else {
@@ -259,6 +259,51 @@ try {
   verifier("erreur dans une action : bandeau avec la ligne",
            (await cadre.locator(".kp-erreur").innerText()).includes("Erreur de division par zéro (ligne 4"));
   verifier("la page reste utilisable après l'erreur", await cadre.getByRole("button", { name: "Panne" }).isEnabled());
+
+  // K+ Serveur : le site tourne en mémoire, ses pages s'affichent dans un cadre isolé.
+  const serveur = page.frameLocator("#page-serveur");
+  const attendreAdresse = (texte) => page.waitForFunction(
+    (t) => document.getElementById("adresse-serveur").textContent === t, texte, { timeout: 30000 });
+  await lancerSite("serveur_livre_or");
+  await page.waitForFunction(() => {
+    const d = document.getElementById("page-serveur").contentDocument;
+    return d && d.querySelector("h1");
+  }, null, { timeout: 60000 });
+  verifier("site côté serveur : aperçu de la page d'accueil",
+           (await serveur.locator("h1").innerText()) === "Livre d'or de la classe" &&
+           (await page.locator("#adresse-serveur").innerText()) === "/");
+  await serveur.getByLabel("Votre nom").fill("Awa");
+  await serveur.getByLabel("Votre message").fill("<b>Bonjour</b> la classe");
+  await serveur.getByRole("button", { name: "Publier" }).click();
+  await page.waitForFunction(() => {
+    const d = document.getElementById("page-serveur").contentDocument;
+    return d && d.querySelectorAll("li").length === 1;
+  }, null, { timeout: 30000 });
+  verifier("formulaire envoyé au moteur, redirection suivie, texte échappé",
+           (await serveur.locator("li").innerText()) === "Awa : <b>Bonjour</b> la classe" &&
+           (await serveur.locator("li b").count()) === 0 &&
+           (await serveur.locator("p").first().innerText()) === "1 message(s)");
+  await lancerSite("serveur_comptes");
+  await page.waitForFunction(() => document.getElementById("page-serveur").contentDocument?.querySelector("h1"),
+                             null, { timeout: 30000 });
+  await serveur.getByLabel("Nom d'utilisateur").nth(1).fill("Awa");
+  await serveur.getByLabel("Mot de passe (8 caractères au moins)").fill("motdepasse1");
+  await serveur.getByRole("button", { name: "Créer mon compte" }).click();
+  await page.waitForFunction(() => document.getElementById("page-serveur").contentDocument
+    ?.querySelector("h1")?.textContent === "Bonjour Awa !", null, { timeout: 30000 });
+  verifier("comptes : inscription, mot de passe chiffré, session", true);
+  await lancerSite('utiliser serveur\nfonction a()\n    titre("A")\n    lien("Vers B", "/b")\nfin\n' +
+                   'fonction b()\n    titre("B " + texte(1 / 0))\nfin\npage("/", a)\npage("/b", b)\n');
+  await page.waitForFunction(() => {
+    const d = document.getElementById("page-serveur").contentDocument;
+    return d && d.querySelector("a");
+  }, null, { timeout: 30000 });
+  await serveur.getByRole("link", { name: "Vers B" }).click();
+  await attendreAdresse("/b  (500)");
+  verifier("lien interne suivi ; erreur 500 avec la ligne",
+           (await serveur.locator("pre").innerText()).includes("ligne 7"));
+  verifier("scripts interdits dans l'aperçu",
+           (await page.locator("#page-serveur").getAttribute("sandbox")) === "allow-same-origin");
 
   await lancerSite('utiliser web\nfonction boucle()\n    tant que vrai faire\n    fin\nfin\nbouton("Bloquer", boucle)\n');
   await cadre.getByRole("button", { name: "Bloquer" }).click();

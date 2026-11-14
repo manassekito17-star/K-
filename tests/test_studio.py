@@ -178,6 +178,11 @@ class TestColoration(unittest.TestCase):
         from kplus.web import NOMS_WEB
         self.assertEqual(self.liste_js("NATIVES_WEB"), set(NOMS_WEB))
 
+    def test_natives_serveur(self):
+        from kplus.serveur import NOMS_SERVEUR
+        from kplus.web import NOMS_WEB
+        self.assertEqual(self.liste_js("NATIVES_SERVEUR"), set(NOMS_SERVEUR) - set(NOMS_WEB))
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -287,3 +287,11 @@ button.installer { border-color: var(--accent); color: var(--accent); font-weigh
   .execution button { flex: 1; }
   .barre { padding: 10px 16px; }
 }
+
+/* Aperçu d'un site côté serveur (« utiliser serveur ») */
+.barre-serveur { display: flex; gap: 10px; align-items: center; padding: 6px 12px; font-size: .85rem;
+  background: #eef2ff; color: #1f2a5a; border-bottom: 1px solid #d5dcf5; }
+.barre-serveur[hidden] { display: none; }
+.barre-serveur code { font-weight: 600; }
+.page-serveur { display: block; width: 100%; min-height: 420px; height: calc(100% - 34px); border: 0; background: #fff; }
+.page-serveur[hidden] { display: none; }

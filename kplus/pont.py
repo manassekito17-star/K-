@@ -117,6 +117,9 @@ class EntreeStudio:
 # Programme web en cours (« utiliser web ») : il reste vivant entre deux
 # événements (clics, saisies, minuteries) pour garder ses variables.
 _session = None
+# Site côté serveur en cours (« utiliser serveur ») : [application, cookie, source].
+_serveur = None
+REDIRECTIONS_MAX = 5
 
 
 def executer(source: str, entree: str, envoyer) -> str:
@@ -125,8 +128,9 @@ def executer(source: str, entree: str, envoyer) -> str:
 
     Pour un programme web, le résultat contient aussi "web": true et les
     "commandes" qui construisent la page (voir kplus/web.py)."""
-    global _session
+    global _session, _serveur
     _session = None
+    _serveur = None
     debut = time.monotonic()
     sortie = SortieStudio(envoyer)
     resultat = {"statut": "ok"}
@@ -145,6 +149,13 @@ def executer(source: str, entree: str, envoyer) -> str:
         resultat["web"] = True
         resultat["commandes"] = interpreteur.page.prendre_commandes()
         _session = (interpreteur, source)
+    if interpreteur is not None and interpreteur.serveur is not None and resultat["statut"] == "ok":
+        _serveur = [interpreteur.serveur, None, source]
+        resultat["serveur"] = True
+        resultat["pages"] = [r.adresse for r in interpreteur.serveur.pages]
+        adresse = "/" if any(r.correspond("/") is not None for r in interpreteur.serveur.pages) \
+            else (resultat["pages"] or ["/"])[0]
+        resultat["visite"] = _visiter("GET", adresse, b"")
     resultat["duree_ms"] = round((time.monotonic() - debut) * 1000)
     return json.dumps(resultat)
 
@@ -167,6 +178,44 @@ def evenement(identifiant: str, genre: str, valeurs: str, envoyer) -> str:
     if erreur:
         resultat["texte_erreur"] = erreur
     return json.dumps(resultat)
+
+
+def _visiter(methode, adresse, corps):
+    """Visite une adresse du site en cours, en gardant le cookie de session
+    et en suivant les redirections. Renvoie {statut, adresse, html}."""
+    app, cookie, _ = _serveur
+    for _ in range(REDIRECTIONS_MAX + 1):
+        entetes = {"Host": "kplus.local"}
+        if cookie:
+            entetes["Cookie"] = cookie
+        if methode == "POST":
+            entetes["Content-Type"] = "application/x-www-form-urlencoded"
+        reponse = app.traiter(methode, adresse, entetes, corps)
+        nouveau = reponse.entete("Set-Cookie")
+        if nouveau:
+            cookie = _serveur[1] = nouveau.split(";")[0]
+        if reponse.statut == 303 and reponse.entete("Location"):
+            methode, adresse, corps = "GET", reponse.entete("Location"), b""
+            continue
+        return {"statut": reponse.statut, "adresse": adresse, "html": reponse.corps.decode("utf-8")}
+    return {"statut": 508, "adresse": adresse, "html": "<p>Trop de redirections.</p>"}
+
+
+def serveur_requete(methode: str, adresse: str, champs: str, envoyer) -> str:
+    """Visite d'une page du site côté serveur en cours (aperçu dans le
+    navigateur). `champs` : JSON d'une liste de paires [nom, valeur] envoyées
+    par un formulaire."""
+    import urllib.parse
+    if _serveur is None:
+        return json.dumps({"statut": 410, "adresse": adresse,
+                           "html": "<p>Le programme n'est plus en cours : exécutez-le à nouveau.</p>"})
+    sortie = SortieStudio(envoyer)
+    _serveur[0].interp.sortie = sortie
+    corps = urllib.parse.urlencode([tuple(p) for p in json.loads(champs or "[]")]).encode("utf-8") if methode == "POST" else b""
+    try:
+        return json.dumps(_visiter(methode.upper(), adresse, corps))
+    finally:
+        sortie.vider()
 
 
 def executer_test(source: str, entree: str) -> str:

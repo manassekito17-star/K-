@@ -36,6 +36,41 @@ bouton("Calculer", calculer)
 - Guide complet : [spécification K+ Web](docs/specification/kplus-web-0.2.md) ;
   exemples : `exemples/site_*.kplus`.
 
+## Créer des sites côté serveur (K+ 0.3)
+
+Comme avec PHP ou Python : pages construites par le serveur, formulaires,
+données enregistrées, comptes avec mot de passe.
+
+```kplus
+utiliser serveur
+
+fonction accueil()
+    titre("Livre d'or")
+    variable messages = liste()
+    pour chaque m dans lire_tout("messages") faire
+        ajouter_ligne(messages, m[1] + " : " + m[2])
+    fin
+    variable f = formulaire("/ecrire")
+    champ_texte(f, "nom", "Votre nom")
+    zone_texte(f, "message", "Votre message")
+    bouton_envoyer(f, "Publier")
+fin
+
+fonction ecrire()
+    enregistrer("messages", [donnee("nom"), donnee("message")])
+    rediriger("/")
+fin
+
+page("/", accueil)
+formulaire_recu("/ecrire", ecrire)
+```
+
+- `kplus --serveur livre.kplus` lance le site sur http://localhost:8000.
+- Sécurité automatique : textes échappés, protection des formulaires (CSRF),
+  mots de passe chiffrés (scrypt), cookie de session protégé.
+- Guide complet : [spécification K+ Serveur](docs/specification/kplus-serveur-0.3.md) ;
+  exemples : `exemples/serveur_*.kplus`.
+
 ## État du projet
 
 **K+ 0.1 fonctionne et est validé** sur Windows, macOS et Linux :
@@ -70,6 +105,7 @@ pip install .
 kplus exemples/bonjour.kplus            # exécuter un programme
 kplus --verifier exemples/bonjour.kplus # vérifier sans exécuter
 kplus --site exemples/site_taches.kplus  # créer un site web publiable
+kplus --serveur exemples/serveur_livre_or.kplus   # lancer un site côté serveur
 kplus                                   # mode interactif
 kplus --aide
 ```
@@ -122,4 +158,5 @@ compte bancaire, grands nombres.
 - [Rapport de validation K+ 0.1](docs/VALIDATION-0.1.md)
 - [Plan de travail](docs/PLAN.md)
 - [K+ Web : créer des sites (K+ 0.2)](docs/specification/kplus-web-0.2.md)
+- [K+ Serveur : sites côté serveur (K+ 0.3)](docs/specification/kplus-serveur-0.3.md)
 - [Feuille de route des versions](docs/FEUILLE-DE-ROUTE.md)

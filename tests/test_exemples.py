@@ -15,7 +15,7 @@ ATTENDUS = RACINE / "tests" / "exemples"
 
 # Cas : (programme, fichier d'entrée clavier ou None, fichier de sortie attendue)
 CAS = [(p.stem, None, p.stem) for p in sorted((RACINE / "exemples").glob("*.kplus"))
-       if p.stem != "devinette" and not p.stem.startswith("site_")]
+       if p.stem != "devinette" and not p.stem.startswith(("site_", "serveur_"))]
 # Les sites (« utiliser web ») se testent dans tests/test_web.py et dans K+ Studio.
 SITES = sorted(p.stem for p in (RACINE / "exemples").glob("site_*.kplus"))
 CAS += [("devinette", "devinette", "devinette"),
@@ -53,6 +53,21 @@ class TestSitesEnLigneDeCommande(unittest.TestCase):
                 self.assertEqual((r.returncode, r.stdout), (0, ""))
                 self.assertIn("crée une page web", r.stderr)
                 self.assertIn("kplus --site", r.stderr)
+
+
+class TestServeursEnLigneDeCommande(unittest.TestCase):
+    def test_message_explicatif(self):
+        serveurs = sorted(p.stem for p in (RACINE / "exemples").glob("serveur_*.kplus"))
+        self.assertGreaterEqual(len(serveurs), 2)
+        for site in serveurs:
+            with self.subTest(site=site):
+                r = subprocess.run(
+                    [sys.executable, "-m", "kplus", f"exemples/{site}.kplus"],
+                    cwd=RACINE, capture_output=True, text=True, encoding="utf-8", timeout=60,
+                    env=dict(os.environ, PYTHONIOENCODING="utf-8"))
+                self.assertEqual((r.returncode, r.stdout), (0, ""))
+                self.assertIn("site côté serveur", r.stderr)
+                self.assertIn("kplus --serveur", r.stderr)
 
 
 if __name__ == "__main__":

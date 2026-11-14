@@ -8,9 +8,11 @@
  *
  * Messages reçus :  { type: "verifier", id, source }
  *                   { type: "executer", source, entree }
+ *                   { type: "serveur", methode, adresse, champs, requete }  (site « utiliser serveur »)
  * Messages envoyés : { type: "pret", version } | { type: "echec", message }
  *                    { type: "verification", id, resultat }
  *                    { type: "flux", genre, texte } | { type: "fin", resultat }
+ *                    { type: "serveur_fin", requete, resultat }
  */
 "use strict";
 
@@ -70,6 +72,19 @@ function traiter(message) {
       resultat = { statut: "interne", commandes: [], texte_erreur: String(erreur && erreur.message || erreur) };
     }
     postMessage({ type: "evenement_fin", requete: message.requete, resultat });
+  } else if (message.type === "serveur") {
+    // Visite d'une page du site côté serveur, exécuté en mémoire par le vrai moteur.
+    const envoyer = (genre, texte) => postMessage({ type: "flux", genre, texte });
+    let resultat;
+    try {
+      resultat = JSON.parse(pont.serveur_requete(message.methode, message.adresse,
+                                                 JSON.stringify(message.champs || []), envoyer));
+    } catch (erreur) {
+      resultat = { statut: 500, adresse: message.adresse,
+                   html: "<p>Erreur interne de K+ : " + String(erreur && erreur.message || erreur)
+                           .replace(/[&<>]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" })[c]) + "</p>" };
+    }
+    postMessage({ type: "serveur_fin", requete: message.requete, resultat });
   }
 }
 

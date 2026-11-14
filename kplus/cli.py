@@ -24,6 +24,8 @@ Utilisation :
                                     simule un visiteur et décrit la page obtenue
   kplus --site programme.kplus [dossier]
                                     crée un site web à partir d'un programme K+ Web
+  kplus --serveur programme.kplus [--port 8000] [--production]
+                                    lance un site côté serveur (« utiliser serveur »)
   kplus                             lance le mode interactif
   kplus --version                   affiche la version
   kplus --aide                      affiche cette aide
@@ -113,6 +115,10 @@ def executer_fichier(chemin):
     except Exception as exc:  # bogue de l'interpréteur
         return erreur_interne(exc)
     sys.stdout.flush()
+    if interpreteur.serveur is not None:
+        ecrire_erreur(
+            f"Ce programme est un site côté serveur ({len(interpreteur.serveur.pages)} page(s)) : "
+            f"pour l'ouvrir, lancez « kplus --serveur {chemin} ».")
     if interpreteur.page is not None:
         visibles = sum(1 for e in interpreteur.page.elements.values()
                        if e.genre != "minuterie" and not e.supprime)
@@ -222,6 +228,83 @@ def creer_site_web(chemin, dossier):
     return SUCCES
 
 
+def lancer_serveur(argv):
+    """kplus --serveur programme.kplus [--port N] [--production]"""
+    import os
+    from pathlib import Path
+    from .serveur import lancer
+    chemin, port, production = None, None, False
+    restants = list(argv)
+    while restants:
+        option = restants.pop(0)
+        if option == "--production":
+            production = True
+        elif option == "--port":
+            if not restants or not restants[0].isdigit() or not 1 <= int(restants[0]) <= 65535:
+                ecrire_erreur("Erreur : --port attend un numéro entre 1 et 65535. Exemple : --port 5000")
+                return ERREUR_UTILISATION
+            port = int(restants.pop(0))
+        elif option.startswith("-") or chemin is not None:
+            ecrire_erreur(f"Erreur : option inattendue « {option} ».\n"
+                          "Exemple : kplus --serveur site.kplus --port 5000")
+            return ERREUR_UTILISATION
+        else:
+            chemin = option
+    if chemin is None:
+        ecrire_erreur("Erreur : --serveur attend un programme. Exemple : kplus --serveur site.kplus")
+        return ERREUR_UTILISATION
+    source, probleme = lire_fichier(chemin)
+    if probleme:
+        ecrire_erreur(probleme)
+        return ERREUR_UTILISATION
+    if port is None:
+        port = int(os.environ.get("PORT", "8000")) if production else 8000
+    hote = "0.0.0.0" if production else "127.0.0.1"
+    interpreteur = Interpreteur()
+    interpreteur.source = source
+    interpreteur.production = production
+    interpreteur.fichier_donnees = str(Path(chemin).with_suffix(".donnees"))
+    try:
+        interpreteur.executer_programme(analyser(source))
+    except ErreurKPlus as e:
+        ecrire_erreur(formater_erreur(e, source))
+        return ERREUR_KPLUS
+    except SignalQuitter as q:
+        return q.code
+    except Interruption:
+        ecrire_erreur("\nProgramme interrompu.")
+        return INTERRUPTION
+    app = interpreteur.serveur
+    if app is None:
+        ecrire_erreur("Erreur : ce programme n'est pas un site côté serveur : "
+                      "ajoutez « utiliser serveur » au début du programme.")
+        return ERREUR_KPLUS
+    if not app.pages:
+        ecrire_erreur("Erreur : ce site n'a aucune page. Déclarez-en une, par exemple : "
+                      "page(\"/\", accueil)")
+        return ERREUR_KPLUS
+
+    def pret(_):
+        adresse = f"http://localhost:{port}"
+        print(f"Site K+ en ligne : {adresse}" + ("  (mode production)" if production else ""))
+        print(f"Données enregistrées dans : {interpreteur.fichier_donnees}")
+        print("Pages : " + ", ".join(r.adresse for r in app.pages))
+        print("Arrêter le serveur : Ctrl+C")
+        sys.stdout.flush()
+
+    try:
+        lancer(app, hote, port, pret=pret)
+    except OSError as e:
+        ecrire_erreur(f"Erreur : impossible d'ouvrir le port {port} ({e.strerror}). "
+                      f"Essayez un autre port : --port 5000")
+        return ERREUR_UTILISATION
+    except KeyboardInterrupt:
+        print("\nServeur arrêté.")
+    finally:
+        app.donnees.fermer()
+    return SUCCES
+
+
 def principal(argv=None) -> int:
     argv = sys.argv[1:] if argv is None else argv
     configurer_flux()
@@ -246,6 +329,8 @@ def principal(argv=None) -> int:
                           "Exemple : kplus --site mon_site.kplus")
             return ERREUR_UTILISATION
         return creer_site_web(argv[1], argv[2] if len(argv) == 3 else None)
+    if premier == "--serveur":
+        return lancer_serveur(argv[1:])
     if premier == "--verifier":
         if len(argv) != 2:
             ecrire_erreur("Erreur : --verifier attend exactement un fichier.\n"

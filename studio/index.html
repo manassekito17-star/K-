@@ -70,6 +70,12 @@
       <pre id="console" class="console" aria-live="polite"></pre>
       <div id="cadre-page" class="cadre-page" role="tabpanel" aria-label="Page web" hidden>
         <div id="page-web"></div>
+        <div id="barre-serveur" class="barre-serveur" hidden>
+          <span>Aperçu du site côté serveur</span>
+          <code id="adresse-serveur"></code>
+        </div>
+        <iframe id="page-serveur" class="page-serveur" title="Aperçu du site côté serveur"
+                sandbox="allow-same-origin" hidden></iframe>
       </div>
       <details class="entrees" id="bloc-entrees">
         <summary>Entrée clavier pour <code>demander()</code></summary>
